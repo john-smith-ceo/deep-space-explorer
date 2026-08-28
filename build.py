@@ -16,6 +16,7 @@ OUT = pathlib.Path(__file__).parent / "deep-space.html"
 
 ORDER = [
     "config.js",
+    "i18n.js",
     "engine/core.js",
     "engine/rng.js",
     "engine/sector.js",
@@ -31,6 +32,7 @@ ORDER = [
     "ui/sysmap.js",
     "ui/dock.js",
     "ui/sound-panel.js",
+    "ui/langmenu.js",
     "ui/jumpmenu.js",
     "ui/sysinfo.js",
     "main.js",

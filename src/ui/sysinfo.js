@@ -24,18 +24,18 @@ function sectorMapSVG(){
 
 function planetCardHTML(p){
   const comp=p.comp.map(c=>
-    '<div class="cmp"><span>'+c[0]+'</span><u><i style="width:'+c[1].toFixed(0)+'%"></i></u><b>'+
+    '<div class="cmp"><span>'+T(c[0])+'</span><u><i style="width:'+c[1].toFixed(0)+'%"></i></u><b>'+
     c[1].toFixed(0)+'%</b></div>').join("");
   return '<div class="pcard">'+
-    '<div class="pc-head">'+p.name+' · '+p.t.ru+(p.arrival?' <em>точка прилёта</em>':'')+'</div>'+
+    '<div class="pc-head">'+T("n."+p.name)+' · '+T(p.t.key)+(p.arrival?' <em>'+T("info.arrival")+'</em>':'')+'</div>'+
     '<div class="pc-grid">'+
-      '<div><span>радиус</span><b>'+fmtNum(p.radius)+' км</b></div>'+
-      '<div><span>орбита</span><b>'+p.au.toFixed(p.au<1?3:2)+' а. е.</b></div>'+
-      '<div><span>сутки</span><b>'+p.day+' ч</b></div>'+
-      '<div><span>год</span><b>'+(p.year>900?(p.year/365.25).toFixed(1)+' года':fmtNum(p.year)+' сут')+'</b></div>'+
-      '<div><span>температура</span><b>'+p.tempK+' K · '+Math.round(p.tempK-273)+' °C</b></div>'+
-      '<div><span>спутники</span><b>'+p.moons+'</b></div>'+
-      '<div><span>кольца</span><b>'+(p.rings?"есть":"нет")+'</b></div>'+
+      '<div><span>'+T("info.radius")+'</span><b>'+fmtNum(p.radius)+' '+T("u.km")+'</b></div>'+
+      '<div><span>'+T("info.orbit")+'</span><b>'+p.au.toFixed(p.au<1?3:2)+' '+T("u.au")+'</b></div>'+
+      '<div><span>'+T("info.day")+'</span><b>'+p.day+' '+T("u.h")+'</b></div>'+
+      '<div><span>'+T("info.year")+'</span><b>'+(p.year>900?(p.year/365.25).toFixed(1)+' '+T("u.yr"):fmtNum(p.year)+' '+T("u.d"))+'</b></div>'+
+      '<div><span>'+T("info.temp")+'</span><b>'+p.tempK+' K · '+Math.round(p.tempK-273)+' °C</b></div>'+
+      '<div><span>'+T("info.moons")+'</span><b>'+p.moons+'</b></div>'+
+      '<div><span>'+T("info.rings")+'</span><b>'+(p.rings?T("info.yes"):T("info.no"))+'</b></div>'+
     '</div><div class="pc-comp">'+comp+'</div></div>';
 }
 
@@ -61,46 +61,46 @@ function commsDelay(){
     const at=planets&&planets.at;
     const au=at?Math.hypot(at.x,at.y,at.z):1;
     const sec=au*499;                       // свет идёт 499 секунд на астрономическую единицу
-    return sec<1 ? (sec*1000).toFixed(0)+" мс"
-         : sec<90 ? sec.toFixed(1)+" с" : (sec/60).toFixed(1)+" мин";
+    return sec<1 ? (sec*1000).toFixed(0)+" "+T("u.ms")
+         : sec<90 ? sec.toFixed(1)+" "+T("u.s") : (sec/60).toFixed(1)+" "+T("u.min");
   }
   const ly=lyHome();
-  return ly===null ? "вне сектора" : fmtNum(ly*10)/10+" лет";
+  return ly===null ? T("comms.outside") : (Math.round(ly*10)/10)+" "+T("u.yr");
 }
 
 function commsHTML(){
   const c=CHANNELS[0];
   const home=sun&&sun.solar;
   return '<div class="comms">'+
-    '<div class="ch-head">СВЯЗЬ</div>'+
+    '<div class="ch-head">'+T("comms.head")+'</div>'+
     '<div class="chan'+(home?" live":"")+'" id="chan-mir">'+
       stationIcon()+
       '<div class="chan-body">'+
-        '<div class="chan-name">'+c.name+' <em>'+c.call+'</em></div>'+
+        '<div class="chan-name">'+T("comms.station")+' <em>'+c.call+'</em></div>'+
         '<div class="chan-grid">'+
-          '<div><span>частота</span><b>'+c.freq+'</b></div>'+
-          '<div><span>режим</span><b>'+c.mode+'</b></div>'+
-          '<div><span>мощность</span><b>'+c.power+'</b></div>'+
-          '<div><span>орбита</span><b>'+c.orbit+'</b></div>'+
-          '<div><span>экипаж</span><b>'+c.crew+'</b></div>'+
-          '<div><span>задержка</span><b>'+commsDelay()+'</b></div>'+
+          '<div><span>'+T("comms.freq")+'</span><b>'+T("comms.freq.v")+'</b></div>'+
+          '<div><span>'+T("comms.mode")+'</span><b>'+T("comms.mode.v")+'</b></div>'+
+          '<div><span>'+T("comms.power")+'</span><b>5 '+T("u.w")+'</b></div>'+
+          '<div><span>'+T("comms.orbit")+'</span><b>390 '+T("u.km")+' · 51,6°</b></div>'+
+          '<div><span>'+T("comms.crew")+'</span><b>'+c.crew+'</b></div>'+
+          '<div><span>'+T("comms.delay")+'</span><b>'+commsDelay()+'</b></div>'+
         '</div>'+
       '</div>'+
-      '<button class="chan-btn" id="chan-test">проверка канала</button>'+
+      '<button class="chan-btn" id="chan-test">'+T("comms.test")+'</button>'+
     '</div></div>';
 }
 
 function buildSysInfo(){
   if(!infoEl) return;
-  const head='<div class="si-top"><h2>'+(sun&&sun.solar?"СОЛНЕЧНАЯ СИСТЕМА":"SYSTEM "+SEED.replace(/S$/,""))+'</h2>'+
-    '<div class="si-sub">'+(sun?(sun.name?sun.name+" · ":"")+sun.t.k+"-TYPE STAR · "+
-      fmtNum(sun.t.rKm)+" км":"светила нет")+
-    ' · сектор '+(sectorAt+1)+' из '+SECTOR.length+'</div>'+
-    '<button class="si-close" id="si-close">закрыть · I</button></div>';
+  const head='<div class="si-top"><h2>'+(sun&&sun.solar?T("sys.solar"):T("sys.system")+" "+SEED.replace(/S$/,""))+'</h2>'+
+    '<div class="si-sub">'+(sun?(sun.name?T("n."+sun.name)+" · ":"")+T("star.fmt").replace("{k}",sun.t.k)+" · "+
+      fmtNum(sun.t.rKm)+" "+T("u.km"):T("star.none"))+
+    ' · '+T("info.sector")+' '+(sectorAt+1)+'/'+SECTOR.length+'</div>'+
+    '<button class="si-close" id="si-close">'+T("info.close")+' · I</button></div>';
 
   if(!planets){
-    infoEl.innerHTML=head+'<div class="si-empty">Планет в этой системе нет — только пыль и свет чужих звёзд.'+
-      '</div><div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">сектор · 20 систем</div></div>'+
+    infoEl.innerHTML=head+'<div class="si-empty">'+T("info.empty")+
+      '</div><div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">'+T("info.sector")+' · '+SECTOR.length+' '+T("info.systems")+'</div></div>'+
       commsHTML();
   }else{
     const parade=planets.list.map(p=>{
@@ -112,14 +112,14 @@ function buildSysInfo(){
       p.light=real;
       return '<figure class="pl'+(p.arrival?' at':'')+'">'+
         '<img src="'+c.toDataURL()+'" alt="">'+
-        '<figcaption>'+p.name+'<span>'+p.t.ru+'</span></figcaption></figure>';
+        '<figcaption>'+T("n."+p.name)+'<span>'+T(p.t.key)+'</span></figcaption></figure>';
     }).join("");
     infoEl.innerHTML=head+
       '<div class="si-parade">'+parade+'</div>'+
       '<div class="si-cols">'+
         '<div class="si-left">'+planetCardHTML(planets.at)+'</div>'+
-        '<div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">сектор · '+
-          SECTOR.length+' систем · пройдено '+SECTOR.filter(s=>s.visited).length+'</div></div>'+
+        '<div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">'+T("info.sector")+' · '+
+          SECTOR.length+' '+T("info.systems")+' · '+T("info.visited")+' '+SECTOR.filter(s=>s.visited).length+'</div></div>'+
       '</div>'+commsHTML();
   }
   const btn=document.getElementById("si-close");

@@ -12,12 +12,12 @@ let jumpOpen=false, jumpList=[], jumpSel=0;
 
 function jumpRow(t,sel){
   const name = t.home ? "SOL" : t.seed.replace(/S$/,"");
-  const star = t.star ? t.star.k+"-type" : "без светила";
-  const pl = t.home ? "8 планет"
-    : (t.visited ? (t.planets===0 ? "планет нет" : t.planets+" планет") : "?");
-  const dist = t.d===null ? "—" : t.d.toFixed(1)+" св. г.";
-  const note = t.home ? "дом · маяк"
-    : (!t.reach ? "вне дальности" : t.visited ? "пройдена" : "не посещена");
+  const star = t.star ? t.star.k+"-type" : T("jump.noStar");
+  const pl = t.home ? "8 "+T("jump.planets")
+    : (t.visited ? (t.planets===0 ? T("jump.noPlanets") : t.planets+" "+T("jump.planets")) : "?");
+  const dist = t.d===null ? "—" : t.d.toFixed(1)+" "+T("u.ly");
+  const note = t.home ? T("jump.home")
+    : (!t.reach ? T("jump.far") : t.visited ? T("jump.visited") : T("jump.new"));
   return '<div class="jrow'+(sel?" sel":"")+(t.reach?"":" far")+'">'+
     '<b>'+name+'</b><span>'+star+'</span><span>'+pl+'</span>'+
     '<i>'+dist+'</i><em>'+note+'</em></div>';
@@ -59,12 +59,12 @@ function buildJumpMenu(){
 
   jumpEl.innerHTML=
     '<div class="jtop"><h2>FRAME SHIFT DRIVE</h2>'+
-      '<div class="jsub">выбор цели · дальность '+JUMP.rangeLy.toFixed(1)+' св. лет</div>'+
-      '<div class="jhint">↑ ↓ выбор · Enter прыжок · Esc отмена</div></div>'+
+      '<div class="jsub">'+T("jump.sub")+' '+JUMP.rangeLy.toFixed(1)+' '+T("u.ly")+'</div>'+
+      '<div class="jhint">'+T("jump.hint")+'</div></div>'+
     '<div class="jbody">'+
       '<div class="jlist">'+jumpList.map((t,n)=>jumpRow(t,n===jumpSel)).join("")+'</div>'+
       '<div class="jmapbox">'+jumpMapSVG()+
-        '<div class="si-cap">сектор '+JUMP.sectorLy+' св. лет</div></div>'+
+        '<div class="si-cap">'+T("jump.sectorCap")+' '+JUMP.sectorLy+' '+T("u.ly")+'</div></div>'+
     '</div>';
 }
 

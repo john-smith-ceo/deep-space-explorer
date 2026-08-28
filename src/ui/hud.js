@@ -15,6 +15,14 @@ window.addEventListener("wheel",e=>{
 },{passive:true});
 window.addEventListener("keydown",e=>{
   const k=e.key.toLowerCase();
+  /* меню языка перехватывает управление первым: оно самое верхнее */
+  if(langOpen){
+    if(e.key==="ArrowUp"){langMove(-1);e.preventDefault();return}
+    if(e.key==="ArrowDown"){langMove(1);e.preventDefault();return}
+    if(e.key==="Enter"){langConfirm();e.preventDefault();return}
+    if(e.key==="Escape"||k==="p"||k==="з"){toggleLangMenu();e.preventDefault();return}
+    return;
+  }
   /* пока открыто меню прыжка, стрелки выбирают цель, а не ведут курс */
   if(jumpOpen){
     if(e.key==="ArrowUp"){jumpMove(-1);e.preventDefault();return}
@@ -37,6 +45,7 @@ window.addEventListener("keydown",e=>{
   else if(k==="x"||k==="ч"){setThrottle(0)}
   else if(k==="m"||k==="ь"){noiseCancel()}
   else if(k==="k"||k==="л"){toggleSoundPanel()}
+  else if(k==="p"||k==="з"){toggleLangMenu()}
   else if(k==="i"||k==="ш"){toggleSysInfo()}
   else if(e.key==="Escape"&&infoOpen){toggleSysInfo()}
 });

@@ -216,6 +216,23 @@ canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
 .chan.tx{border-color:rgba(159,212,255,.7);box-shadow:0 0 26px rgba(159,212,255,.12)}
 .chan.tx .chan-btn{background:rgba(159,212,255,.25);animation:txblink 1s ease-in-out infinite}
 @keyframes txblink{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* выбор языка */
+.langmenu{position:fixed;inset:0;z-index:34;display:none;align-items:center;justify-content:center;
+  background:rgba(2,3,10,.72);backdrop-filter:blur(3px)}
+.langmenu.on{display:flex}
+.lg-box{min-width:280px;border:1px solid rgba(255,157,47,.34);background:rgba(8,8,14,.94);
+  padding:18px 20px 14px;font-size:12px;letter-spacing:.08em;color:rgba(255,196,120,.9)}
+.lg-head{display:flex;align-items:center;font-size:11px;letter-spacing:.26em;
+  color:var(--amber);margin-bottom:14px}
+.lg-key{margin-left:auto;border:1px solid rgba(255,157,47,.4);padding:1px 7px;opacity:.7}
+.lg-row{display:flex;align-items:center;gap:12px;padding:9px 12px;cursor:pointer;
+  border-left:2px solid transparent}
+.lg-row b{font-weight:400;font-size:14px;letter-spacing:.12em}
+.lg-row i{font-style:normal;margin-left:auto;font-size:10px;opacity:.45}
+.lg-row.sel{background:rgba(255,157,47,.10);border-left-color:var(--amber)}
+.lg-row.cur b{color:var(--ice)}
+.lg-hint{margin-top:12px;font-size:10px;letter-spacing:.14em;opacity:.45}
 </style>
 </head>
 <body>
@@ -227,10 +244,10 @@ canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
     <div class="tbar"><div class="tfill" id="tfill" style="height:45%"></div>
       <i style="bottom:25%"></i><i style="bottom:50%"></i><i style="bottom:75%"></i>
     </div>
-    <div class="tlabel">THROTTLE</div>
+    <div class="tlabel" id="tlabel">THROTTLE</div>
     <div class="tval" id="tval">45%</div>
   </div>
-  <div class="speed"><div class="n" id="spd">0</div><div class="u">M/S</div>
+  <div class="speed"><div class="n" id="spd">0</div><div class="u" id="uspeed">M/S</div>
     <div class="fsd" id="fsd">FRAME SHIFT DRIVE</div>
   </div>
   <div class="retic"><span></span><span></span><span></span><span></span><b></b></div>
@@ -240,20 +257,23 @@ canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
     <div class="dock-side" id="dock-r"></div>
   </div>
   <div class="help" id="help">
-    <kbd>← ↑ ↓ →</kbd> курс <kbd>колесо</kbd> / <kbd>W</kbd><kbd>S</kbd> тяга
-    <kbd>Space</kbd> форсаж <kbd>J</kbd> выбор цели <kbd>I</kbd> система
-    <kbd>X</kbd> стоп <kbd>M</kbd> шумоподавление <kbd>K</kbd> настройка <kbd>F</kbd> полный экран <kbd>H</kbd> интерфейс
+    <kbd>I</kbd> <span id="help-i">system</span>
+    <kbd>J</kbd> <span id="help-j">jump target</span>
+    <kbd>P</kbd> <span id="help-p">language</span>
   </div>
 </div>
 
 <div class="sysinfo" id="sysinfo"></div>
 <div class="jumpmenu" id="jumpmenu"></div>
+<div class="langmenu" id="langmenu"></div>
 <div class="sndcfg" id="sndcfg"></div>
 
 <div class="boot" id="boot">
   <h1>Deep Space</h1>
-  <p>полёт сквозь пыль и звёзды<br>стрелки ведут курс · колесо задаёт тягу · пробел форсирует<br><b>J</b> — прыжок в соседнюю систему · <b>I</b> — сводка по системе</p>
-  <button id="go">Запустить полёт</button>
+  <p><span id="boot1">a drift through dust and stars</span><br>
+     <span id="boot2">arrows steer · wheel sets thrust · space boosts</span><br>
+     <span id="boot3"><b>J</b> — jump to a nearby system · <b>I</b> — system report</span></p>
+  <button id="go">Launch</button>
 </div>
 <script>
 (function(){
@@ -414,14 +434,14 @@ const PLANET={
   ringChance:.34,                   // шанс колец у газового гиганта
   orbit0:.36, orbitStep:1.62,       // ряд орбит: каждая следующая дальше в 1,6 раза
   types:[
-    {k:"rock",  ru:"каменистая",     base:"128,112,98",  alt:"92,78,66",   band:0,  atm:.10, atmCol:"150,160,180"},
-    {k:"iron",  ru:"железная",       base:"140,104,86",  alt:"96,66,54",   band:0,  atm:.04, atmCol:"180,140,120"},
-    {k:"ice",   ru:"ледяная",        base:"196,214,232", alt:"150,176,206",band:0,  atm:.16, atmCol:"180,210,255"},
-    {k:"ocean", ru:"океаническая",   base:"46,92,150",   alt:"120,150,110",band:0,  atm:.30, atmCol:"120,180,255"},
-    {k:"lava",  ru:"вулканическая",  base:"92,44,34",    alt:"226,110,40", band:0,  atm:.14, atmCol:"255,140,90"},
-    {k:"desert",ru:"пустынная",      base:"186,150,102", alt:"140,104,70", band:0,  atm:.12, atmCol:"230,200,150"},
-    {k:"gas",   ru:"газовый гигант", base:"196,168,132", alt:"150,120,96", band:1,  atm:.22, atmCol:"235,215,180"},
-    {k:"ice-g", ru:"ледяной гигант", base:"104,150,196", alt:"70,110,160", band:1,  atm:.24, atmCol:"170,210,255"}
+    {k:"rock", key:"p.rock",  base:"128,112,98",  alt:"92,78,66",   band:0,  atm:.10, atmCol:"150,160,180"},
+    {k:"iron", key:"p.iron",  base:"140,104,86",  alt:"96,66,54",   band:0,  atm:.04, atmCol:"180,140,120"},
+    {k:"ice", key:"p.ice",   base:"196,214,232", alt:"150,176,206",band:0,  atm:.16, atmCol:"180,210,255"},
+    {k:"ocean", key:"p.ocean", base:"46,92,150",   alt:"120,150,110",band:0,  atm:.30, atmCol:"120,180,255"},
+    {k:"lava", key:"p.lava",  base:"92,44,34",    alt:"226,110,40", band:0,  atm:.14, atmCol:"255,140,90"},
+    {k:"desert", key:"p.desert",base:"186,150,102", alt:"140,104,70", band:0,  atm:.12, atmCol:"230,200,150"},
+    {k:"gas", key:"p.gas",   base:"196,168,132", alt:"150,120,96", band:1,  atm:.22, atmCol:"235,215,180"},
+    {k:"ice-g", key:"p.ice-g", base:"104,150,196", alt:"70,110,160", band:1,  atm:.24, atmCol:"170,210,255"}
   ]
 };
 
@@ -448,6 +468,151 @@ const STAR_CFG={
   haloAspect:1.00,   // общий множитель к эллипсоидности ореола
   dist:1.00          // удалённость текущей звезды, множитель к тому, что дал seed
 };
+
+/* ==== i18n.js ==== */
+/* ================= язык =================
+   По умолчанию английский: заставку смотрят не только дома. Русский
+   переключается в меню по клавише P, выбор запоминается.
+
+   Ключи плоские, без вложенности: словарь читается глазами целиком, а
+   пропущенный ключ виден сразу — T() возвращает его как есть. */
+
+const LANG_LIST=[["en","English"],["ru","Русский"]];
+let LANG=(function(){
+  try{ const s=localStorage.getItem("dse-lang"); if(s==="ru"||s==="en") return s; }catch(e){}
+  return "en";
+})();
+
+const DICT={
+  en:{
+    "sys.solar":"SOLAR SYSTEM", "sys.system":"SYSTEM", "sys.noStar":"NO STAR",
+    "star.fmt":"{k}-TYPE STAR", "star.none":"no star",
+    "map.noStar":"NO STAR IN SYSTEM", "map.planets":"PLANETS",
+    "hud.throttle":"THROTTLE", "hud.speed":"M/S",
+    "hud.fsd":"FRAME SHIFT DRIVE", "hud.charging":"FSD CHARGING",
+    "hud.witch":"WITCHSPACE", "hud.arrival":"ARRIVAL",
+    "help.system":"system", "help.jump":"jump target", "help.lang":"language",
+    "boot.sub1":"a drift through dust and stars",
+    "boot.sub2":"arrows steer · wheel sets thrust · space boosts",
+    "boot.sub3":"<b>J</b> — jump to a nearby system · <b>I</b> — system report",
+    "boot.go":"Launch",
+    "info.close":"close", "info.empty":"No planets here — only dust and the light of other stars.",
+    "info.sector":"sector", "info.systems":"systems", "info.visited":"visited",
+    "info.arrival":"arrival point", "info.radius":"radius", "info.orbit":"orbit",
+    "info.day":"day", "info.year":"year", "info.temp":"temperature",
+    "info.moons":"moons", "info.rings":"rings", "info.yes":"yes", "info.no":"none",
+    "comms.head":"COMMS", "comms.freq":"frequency", "comms.mode":"mode",
+    "comms.power":"power", "comms.orbit":"orbit", "comms.crew":"crew",
+    "comms.delay":"delay", "comms.test":"channel check", "comms.station":"MIR Station",
+    "comms.mode.v":"FM · duplex", "comms.freq.v":"143.625 MHz", "comms.outside":"outside sector",
+    "jump.sub":"select target · range", "jump.hint":"↑ ↓ select · Enter jump · Esc cancel",
+    "jump.home":"home · beacon", "jump.far":"out of range", "jump.visited":"visited",
+    "jump.new":"unvisited", "jump.noStar":"no star", "jump.planets":"planets",
+    "jump.noPlanets":"no planets", "jump.sectorCap":"sector",
+    "u.ly":"ly", "u.au":"AU", "u.km":"km", "u.kkm":"thousand km", "u.d":"d",
+    "u.yr":"yr", "u.h":"h", "u.s":"s", "u.ms":"ms", "u.min":"min", "u.ppm":"ppm",
+    "u.usv":"µSv/h", "u.w":"W",
+    "d.throttle":"THRUST", "d.speed":"SPEED", "d.reactor":"REACTOR", "d.fuel":"FUEL",
+    "d.core":"REACTOR CORE", "d.drive":"DRIVE", "d.skin":"HULL SKIN", "d.hull":"HULL",
+    "d.shield":"SHIELDS", "d.fsd":"FSD", "d.range":"RANGE", "d.wear":"SERVICE LIFE",
+    "d.o2":"OXYGEN", "d.co2":"CARBON DIOXIDE", "d.grav":"GRAVITY", "d.rad":"RADIATION",
+    "d.star":"TO STAR", "d.target":"TO TARGET", "d.home":"COMMS · HOME", "d.drift":"NAV DRIFT",
+    "lang.title":"LANGUAGE", "lang.hint":"↑ ↓ select · Enter apply · Esc close",
+    "snd.title":"SOUND", "snd.select":"select", "snd.reset":"reset",
+    "p.rock":"rocky", "p.iron":"iron", "p.ice":"icy", "p.ocean":"ocean",
+    "p.lava":"volcanic", "p.desert":"desert", "p.gas":"gas giant", "p.ice-g":"ice giant",
+    "c.hydrogen":"hydrogen", "c.helium":"helium", "c.methane":"methane",
+    "c.ammonia":"ammonia", "c.ice":"ice", "c.waterIce":"water ice",
+    "c.ammoniaIce":"ammonia ice", "c.silicates":"silicates", "c.iron":"iron",
+    "c.water":"water", "c.carbon":"carbon", "c.sulphur":"sulphur",
+    "c.basalt":"basalt", "c.nickel":"nickel", "c.oxides":"oxides", "c.magnesium":"magnesium",
+    "n.Меркурий":"Mercury", "n.Венера":"Venus", "n.Земля":"Earth", "n.Марс":"Mars",
+    "n.Юпитер":"Jupiter", "n.Сатурн":"Saturn", "n.Уран":"Uranus", "n.Нептун":"Neptune",
+    "n.Солнце":"Sun"
+  },
+  ru:{
+    "sys.solar":"СОЛНЕЧНАЯ СИСТЕМА", "sys.system":"СИСТЕМА", "sys.noStar":"БЕЗ СВЕТИЛА",
+    "star.fmt":"КЛАСС {k}", "star.none":"светила нет",
+    "map.noStar":"СИСТЕМА БЕЗ СВЕТИЛА", "map.planets":"ПЛАНЕТ",
+    "hud.throttle":"ТЯГА", "hud.speed":"М/С",
+    "hud.fsd":"ГИПЕРПРИВОД", "hud.charging":"РАСКРУТКА ПРИВОДА",
+    "hud.witch":"ГИПЕРПРОСТРАНСТВО", "hud.arrival":"ВЫХОД",
+    "help.system":"система", "help.jump":"выбор цели", "help.lang":"язык",
+    "boot.sub1":"полёт сквозь пыль и звёзды",
+    "boot.sub2":"стрелки ведут курс · колесо задаёт тягу · пробел форсирует",
+    "boot.sub3":"<b>J</b> — прыжок в соседнюю систему · <b>I</b> — сводка по системе",
+    "boot.go":"Запустить полёт",
+    "info.close":"закрыть", "info.empty":"Планет в этой системе нет — только пыль и свет чужих звёзд.",
+    "info.sector":"сектор", "info.systems":"систем", "info.visited":"пройдено",
+    "info.arrival":"точка прилёта", "info.radius":"радиус", "info.orbit":"орбита",
+    "info.day":"сутки", "info.year":"год", "info.temp":"температура",
+    "info.moons":"спутники", "info.rings":"кольца", "info.yes":"есть", "info.no":"нет",
+    "comms.head":"СВЯЗЬ", "comms.freq":"частота", "comms.mode":"режим",
+    "comms.power":"мощность", "comms.orbit":"орбита", "comms.crew":"экипаж",
+    "comms.delay":"задержка", "comms.test":"проверка канала", "comms.station":"Станция МИР",
+    "comms.mode.v":"FM · дуплекс", "comms.freq.v":"143,625 МГц", "comms.outside":"вне сектора",
+    "jump.sub":"выбор цели · дальность", "jump.hint":"↑ ↓ выбор · Enter прыжок · Esc отмена",
+    "jump.home":"дом · маяк", "jump.far":"вне дальности", "jump.visited":"пройдена",
+    "jump.new":"не посещена", "jump.noStar":"без светила", "jump.planets":"планет",
+    "jump.noPlanets":"планет нет", "jump.sectorCap":"сектор",
+    "u.ly":"св. г.", "u.au":"а. е.", "u.km":"км", "u.kkm":"тыс. км", "u.d":"сут",
+    "u.yr":"года", "u.h":"ч", "u.s":"с", "u.ms":"мс", "u.min":"мин", "u.ppm":"ppm",
+    "u.usv":"мкЗв/ч", "u.w":"Вт",
+    "d.throttle":"ТЯГА", "d.speed":"СКОРОСТЬ", "d.reactor":"РЕАКТОР", "d.fuel":"ТОПЛИВО",
+    "d.core":"АКТИВНАЯ ЗОНА", "d.drive":"ДВИГАТЕЛЬ", "d.skin":"ОБШИВКА", "d.hull":"КОРПУС",
+    "d.shield":"ЩИТЫ", "d.fsd":"ПРИВОД", "d.range":"ДАЛЬНОСТЬ", "d.wear":"РЕСУРС",
+    "d.o2":"КИСЛОРОД", "d.co2":"УГЛЕКИСЛОТА", "d.grav":"ТЯЖЕСТЬ", "d.rad":"РАДИАЦИЯ",
+    "d.star":"ДО СВЕТИЛА", "d.target":"ДО ЦЕЛИ", "d.home":"СВЯЗЬ · ДОМ", "d.drift":"СНОС НАВИГ.",
+    "lang.title":"ЯЗЫК", "lang.hint":"↑ ↓ выбор · Enter принять · Esc закрыть",
+    "snd.title":"ЗВУК", "snd.select":"выделить", "snd.reset":"сброс",
+    "p.rock":"каменистая", "p.iron":"железная", "p.ice":"ледяная", "p.ocean":"океаническая",
+    "p.lava":"вулканическая", "p.desert":"пустынная", "p.gas":"газовый гигант",
+    "p.ice-g":"ледяной гигант",
+    "c.hydrogen":"водород", "c.helium":"гелий", "c.methane":"метан",
+    "c.ammonia":"аммиак", "c.ice":"лёд", "c.waterIce":"водяной лёд",
+    "c.ammoniaIce":"аммиачный лёд", "c.silicates":"силикаты", "c.iron":"железо",
+    "c.water":"вода", "c.carbon":"углерод", "c.sulphur":"сера",
+    "c.basalt":"базальт", "c.nickel":"никель", "c.oxides":"оксиды", "c.magnesium":"магний",
+    "n.Меркурий":"Меркурий", "n.Венера":"Венера", "n.Земля":"Земля", "n.Марс":"Марс",
+    "n.Юпитер":"Юпитер", "n.Сатурн":"Сатурн", "n.Уран":"Уран", "n.Нептун":"Нептун",
+    "n.Солнце":"Солнце"
+  }
+};
+
+function T(key){
+  const d=DICT[LANG]||DICT.en;
+  return (key in d) ? d[key] : ((key in DICT.en) ? DICT.en[key] : key);
+}
+
+/* число с разделителем разрядов по правилам выбранного языка */
+function TN(v){ return v.toLocaleString(LANG==="ru"?"ru-RU":"en-GB"); }
+
+function setLang(code){
+  if(!DICT[code]||code===LANG) return;
+  LANG=code;
+  try{ localStorage.setItem("dse-lang",code); }catch(e){}
+  document.documentElement.lang=code;
+  applyStaticLang();
+  if(typeof syncStarPanelLang==="function") syncStarPanelLang();
+  if(typeof syncSysInfo==="function") syncSysInfo();
+  if(typeof dockRelabel==="function") dockRelabel();
+  if(typeof buildJumpMenu==="function"&&typeof jumpOpen!=="undefined"&&jumpOpen) buildJumpMenu();
+  if(typeof sysEl!=="undefined"&&sysEl&&typeof SEED!=="undefined") sysLabel();
+}
+
+/* надписи, которые лежат прямо в разметке */
+function applyStaticLang(){
+  const set=(id,txt)=>{ const e=document.getElementById(id); if(e) e.innerHTML=txt; };
+  set("tlabel",T("hud.throttle"));
+  set("uspeed",T("hud.speed"));
+  set("boot1",T("boot.sub1"));
+  set("boot2",T("boot.sub2"));
+  set("boot3",T("boot.sub3"));
+  set("go",T("boot.go"));
+  set("help-i",T("help.system"));
+  set("help-j",T("help.jump"));
+  set("help-p",T("help.lang"));
+}
 
 /* ==== engine/core.js ==== */
 const cv=document.getElementById("c"), ctx=cv.getContext("2d",{alpha:false});
@@ -829,14 +994,15 @@ function ringTexture(p){
 
 /* состав выдумывается по типу, но не наобум: доли нормируются к сотне */
 function planetComposition(t,r){
-  const mix = t.k==="gas"   ? [["водород",62,18],["гелий",22,10],["метан",5,4],["аммиак",3,3]]
-            : t.k==="ice-g" ? [["водород",42,14],["гелий",16,8],["метан",18,8],["лёд",16,8]]
-            : t.k==="ice"   ? [["водяной лёд",54,16],["силикаты",22,10],["аммиачный лёд",12,8],["железо",6,4]]
-            : t.k==="ocean" ? [["вода",58,14],["силикаты",24,10],["железо",12,6],["углерод",4,3]]
-            : t.k==="lava"  ? [["силикаты",48,12],["железо",30,10],["сера",10,6],["базальт",8,5]]
-            : t.k==="iron"  ? [["железо",62,12],["никель",18,8],["силикаты",14,8],["сера",4,3]]
-            : t.k==="desert"? [["силикаты",56,12],["железо",20,8],["оксиды",16,8],["углерод",4,3]]
-            :                 [["силикаты",52,12],["железо",26,10],["магний",14,8],["углерод",5,4]];
+  // состав хранится ключами словаря: подписи переводятся, доли — нет
+  const mix = t.k==="gas"   ? [["c.hydrogen",62,18],["c.helium",22,10],["c.methane",5,4],["c.ammonia",3,3]]
+            : t.k==="ice-g" ? [["c.hydrogen",42,14],["c.helium",16,8],["c.methane",18,8],["c.ice",16,8]]
+            : t.k==="ice"   ? [["c.waterIce",54,16],["c.silicates",22,10],["c.ammoniaIce",12,8],["c.iron",6,4]]
+            : t.k==="ocean" ? [["c.water",58,14],["c.silicates",24,10],["c.iron",12,6],["c.carbon",4,3]]
+            : t.k==="lava"  ? [["c.silicates",48,12],["c.iron",30,10],["c.sulphur",10,6],["c.basalt",8,5]]
+            : t.k==="iron"  ? [["c.iron",62,12],["c.nickel",18,8],["c.silicates",14,8],["c.sulphur",4,3]]
+            : t.k==="desert"? [["c.silicates",56,12],["c.iron",20,8],["c.oxides",16,8],["c.carbon",4,3]]
+            :                 [["c.silicates",52,12],["c.iron",26,10],["c.magnesium",14,8],["c.carbon",5,4]];
   const raw=mix.map(m=>[m[0], Math.max(1, m[1]+(r()*2-1)*m[2])]);
   const sum=raw.reduce((a,m)=>a+m[1],0);
   return raw.map(m=>[m[0], m[1]/sum*100]);
@@ -1141,6 +1307,14 @@ function cloudSprite(col,peak){
   return c;
 }
 
+/* подпись системы в верхней строке — зависит от языка, потому вынесена */
+function sysLabel(){
+  if(typeof sysEl==="undefined"||!sysEl) return;
+  const name = sun&&sun.solar ? T("sys.solar")
+    : T("sys.system")+" "+String(SEED).replace(/S$/,"");
+  sysEl.textContent = name+" · "+(sun ? T("star.fmt").replace("{k}",sun.t.k) : T("sys.noStar"));
+}
+
 /* ================= мир ================= */
 let SEED="", GAS_SPR=[], DUST_SPR=[];
 let gas=[], dust=[], grit=[], far=[], sun=null, planets=null;
@@ -1223,8 +1397,7 @@ function buildWorld(seed){
     placeArrival(sun,planets);            // ставит корабль и раздаёт векторы
     sun.tex=starTexture(sun); sun.halo=starHalo(sun);
   }
-  if(sysEl) sysEl.textContent=(sun&&sun.solar ? "СОЛНЕЧНАЯ СИСТЕМА"
-    : "SYSTEM "+seed.replace(/S$/,""))+" · "+(sun?sun.t.k+"-TYPE STAR":"NO STAR");
+  sysLabel();
   if(typeof syncSysInfo==="function") syncSysInfo();       // сводка по системе и радар
   try{ history.replaceState(null,"","#"+seed); }catch(e){}
 }
@@ -1329,7 +1502,7 @@ function shipUpdate(dt,load,boost,jumpK){
   STATUS.shield=Math.min(100, STATUS.shield + dt*(2.2-load*1.2));
 }
 
-function fmt1(v){ return (Math.round(v*10)/10).toLocaleString("ru-RU"); }
+function fmt1(v){ return TN(Math.round(v*10)/10); }
 
 /* расстояние до дома в световых годах — из него же выводится задержка связи */
 function lyHome(){
@@ -1347,28 +1520,28 @@ function shipReadout(){
   const rad=8+(STATUS.star||0)*260;
   const at=planets&&planets.at;
   return [
-    ["ТЯГА",        Math.round(S.throttle*100)+" %",    S.throttle],
-    ["СКОРОСТЬ",    Math.round(S.speed*38).toLocaleString("ru-RU")+" м/с", load],
-    ["РЕАКТОР",     Math.round(28+load*70+boost*2)+" %", .28+load*.7],
-    ["ТОПЛИВО",     fmt1(STATUS.fuel)+" %",               STATUS.fuel/100],
-    ["АКТИВНАЯ ЗОНА", Math.round(STATUS.coreT)+" K",      Math.min(1,STATUS.coreT/4200)],
-    ["ДВИГАТЕЛЬ",   Math.round(STATUS.driveT)+" K",       Math.min(1,STATUS.driveT/900)],
-    ["ОБШИВКА",     Math.round(STATUS.skinT)+" K",        Math.min(1,STATUS.skinT/700)],
-    ["КОРПУС",      Math.round(STATUS.hull)+" %",         STATUS.hull/100],
-    ["ЩИТЫ",        Math.round(STATUS.shield)+" %",       STATUS.shield/100],
-    ["ПРИВОД",      Math.round(jumpCharge*100)+" %",    jumpCharge],
-    ["ДАЛЬНОСТЬ",   JUMP.rangeLy.toFixed(1)+" св. г.",  1],
-    ["РЕСУРС",      fmt1(100-STATUS.wear)+" %",           (100-STATUS.wear)/100],
-    ["КИСЛОРОД",    fmt1(STATUS.o2)+" %",                 STATUS.o2/100],
-    ["УГЛЕКИСЛОТА", Math.round(STATUS.co2)+" ppm",        Math.min(1,STATUS.co2/1200)],
-    ["ТЯЖЕСТЬ",     (0.94+boost*.22).toFixed(2)+" g",   (0.94+boost*.22)/2],
-    ["РАДИАЦИЯ",    Math.round(rad)+" мкЗв/ч",          Math.min(1,rad/900)],
-    ["ДО СВЕТИЛА",  dStar===null?"—":dStar.toFixed(2)+" а. е.", dStar===null?0:Math.min(1,dStar/30)],
-    ["ДО ЦЕЛИ",     at?(Math.hypot(at.x,at.y,at.z)*SCALE.kmPerAU/1000).toFixed(0)+" тыс. км":"—",
+    ["d.throttle", Math.round(S.throttle*100)+" %", S.throttle],
+    ["d.speed", TN(Math.round(S.speed*38))+" "+T("hud.speed").toLowerCase(), load],
+    ["d.reactor", Math.round(28+load*70+boost*2)+" %", .28+load*.7],
+    ["d.fuel", fmt1(STATUS.fuel)+" %", STATUS.fuel/100],
+    ["d.core", Math.round(STATUS.coreT)+" K", Math.min(1,STATUS.coreT/4200)],
+    ["d.drive", Math.round(STATUS.driveT)+" K", Math.min(1,STATUS.driveT/900)],
+    ["d.skin", Math.round(STATUS.skinT)+" K", Math.min(1,STATUS.skinT/700)],
+    ["d.hull", Math.round(STATUS.hull)+" %", STATUS.hull/100],
+    ["d.shield", Math.round(STATUS.shield)+" %", STATUS.shield/100],
+    ["d.fsd", Math.round(jumpCharge*100)+" %", jumpCharge],
+    ["d.range", JUMP.rangeLy.toFixed(1)+" "+T("u.ly"), 1],
+    ["d.wear", fmt1(100-STATUS.wear)+" %", (100-STATUS.wear)/100],
+    ["d.o2", fmt1(STATUS.o2)+" %", STATUS.o2/100],
+    ["d.co2", Math.round(STATUS.co2)+" "+T("u.ppm"), Math.min(1,STATUS.co2/1200)],
+    ["d.grav", (0.94+boost*.22).toFixed(2)+" g", (0.94+boost*.22)/2],
+    ["d.rad", Math.round(rad)+" "+T("u.usv"), Math.min(1,rad/900)],
+    ["d.star", dStar===null?"—":dStar.toFixed(2)+" "+T("u.au"), dStar===null?0:Math.min(1,dStar/30)],
+    ["d.target", at?TN(+(Math.hypot(at.x,at.y,at.z)*SCALE.kmPerAU/1000).toFixed(0))+" "+T("u.kkm"):"—",
                     at?Math.min(1,Math.hypot(at.x,at.y,at.z)*4000):0],
-    ["СВЯЗЬ · ДОМ", home===null?"вне сектора":fmt1(home)+" лет",
+    ["d.home", home===null?T("comms.outside"):fmt1(home)+" "+T("u.yr"),
                     home===null?0:Math.min(1,home/JUMP.sectorLy)],
-    ["СНОС НАВИГ.", Math.round(STATUS.drift)+" км",       Math.min(1,STATUS.drift/9000)]
+    ["d.drift", TN(Math.round(STATUS.drift))+" "+T("u.km"), Math.min(1,STATUS.drift/9000)]
   ];
 }
 
@@ -1909,7 +2082,7 @@ function frame(now){
   if(typeof audioUpdate==="function") audioUpdate(fast,S.boost,jumpK);
   spdEl.textContent=Math.round(S.speed*38).toLocaleString("ru-RU");
   fsdEl.classList.toggle("on",S.boost>.25||J.ph>0);
-  fsdEl.textContent=J.ph?(J.ph===1?"FSD CHARGING":J.ph===2?"WITCHSPACE":"ARRIVAL"):"FRAME SHIFT DRIVE";
+  fsdEl.textContent=J.ph?(J.ph===1?T("hud.charging"):J.ph===2?T("hud.witch"):T("hud.arrival")):T("hud.fsd");
 
   requestAnimationFrame(frame);
 }
@@ -1932,6 +2105,14 @@ window.addEventListener("wheel",e=>{
 },{passive:true});
 window.addEventListener("keydown",e=>{
   const k=e.key.toLowerCase();
+  /* меню языка перехватывает управление первым: оно самое верхнее */
+  if(langOpen){
+    if(e.key==="ArrowUp"){langMove(-1);e.preventDefault();return}
+    if(e.key==="ArrowDown"){langMove(1);e.preventDefault();return}
+    if(e.key==="Enter"){langConfirm();e.preventDefault();return}
+    if(e.key==="Escape"||k==="p"||k==="з"){toggleLangMenu();e.preventDefault();return}
+    return;
+  }
   /* пока открыто меню прыжка, стрелки выбирают цель, а не ведут курс */
   if(jumpOpen){
     if(e.key==="ArrowUp"){jumpMove(-1);e.preventDefault();return}
@@ -1954,6 +2135,7 @@ window.addEventListener("keydown",e=>{
   else if(k==="x"||k==="ч"){setThrottle(0)}
   else if(k==="m"||k==="ь"){noiseCancel()}
   else if(k==="k"||k==="л"){toggleSoundPanel()}
+  else if(k==="p"||k==="з"){toggleLangMenu()}
   else if(k==="i"||k==="ш"){toggleSysInfo()}
   else if(e.key==="Escape"&&infoOpen){toggleSysInfo()}
 });
@@ -2048,7 +2230,7 @@ function drawSysMap(){
   if(!sun){
     mapCtx.fillStyle="rgba(255,157,47,.42)";
     mapCtx.font="9px ui-monospace,monospace"; mapCtx.textAlign="center";
-    mapCtx.fillText("СИСТЕМА БЕЗ СВЕТИЛА",ox,h-6);
+    mapCtx.fillText(T("map.noStar"),ox,h-6);
     return;
   }
 
@@ -2091,7 +2273,7 @@ function drawSysMap(){
 
   mapCtx.fillStyle="rgba(255,157,47,.5)";
   mapCtx.font="10px ui-monospace,monospace"; mapCtx.textAlign="center";
-  mapCtx.fillText((planets?planets.list.length:0)+" ПЛАНЕТ · "+sun.t.k,ox,h-6);
+  mapCtx.fillText((planets?planets.list.length:0)+" "+T("map.planets")+" · "+sun.t.k,ox,h-6);
 }
 
 /* ==== ui/dock.js ==== */
@@ -2107,7 +2289,7 @@ function dockBuild(){
   if(!dockL||!dockR) return;
   const rows=shipReadout();
   const half=Math.ceil(rows.length/2);
-  const cell=(r)=>'<div class="cellx"><span>'+r[0]+'</span><b></b>'+
+  const cell=(r)=>'<div class="cellx"><span>'+T(r[0])+'</span><b></b>'+
                   '<u><i style="width:0%"></i></u></div>';
   dockL.innerHTML=rows.slice(0,half).map(cell).join("");
   dockR.innerHTML=rows.slice(half).map(cell).join("");
@@ -2115,6 +2297,9 @@ function dockBuild(){
     [].slice.call(dockL.querySelectorAll(".cellx")),
     [].slice.call(dockR.querySelectorAll(".cellx")));
 }
+
+/* смена языка: подписи перерисовываются, значения дойдут со следующим тиком */
+function dockRelabel(){ dockCells=null; dockBuild(); }
 
 function dockUpdate(dt){
   if(!dockCells) dockBuild();
@@ -2172,14 +2357,14 @@ function sndLine(){
 function buildSoundPanel(){
   if(!sndPanel||sndPanelBuilt) return;
   sndPanel.innerHTML=
-    '<div class="sc-head">ЗВУК<span class="sc-key">K</span></div>'+
+    '<div class="sc-head">'+T("snd.title")+'<span class="sc-key">K</span></div>'+
     SND_FIELDS.map((f,i)=>
       '<label><span>'+f[1]+'</span><b id="sv'+i+'">'+(+SOUND[f[0]]).toFixed(3)+'</b>'+
       '<input type="range" min="'+f[2]+'" max="'+f[3]+'" step="'+f[4]+
       '" value="'+SOUND[f[0]]+'" data-i="'+i+'"></label>').join("")+
     '<textarea class="sc-out" id="sndout" readonly rows="3"></textarea>'+
-    '<div class="sc-btns"><button id="sndcopy">выделить</button>'+
-    '<button id="sndreset">сброс</button></div>';
+    '<div class="sc-btns"><button id="sndcopy">'+T("snd.select")+'</button>'+
+    '<button id="sndreset">'+T("snd.reset")+'</button></div>';
 
   sndPanel.querySelectorAll("input[type=range]").forEach(inp=>{
     inp.addEventListener("input",e=>{
@@ -2203,6 +2388,8 @@ function buildSoundPanel(){
   sndPanelBuilt=true;
 }
 
+function syncStarPanelLang(){ sndPanelBuilt=false; if(sndPanel){ sndPanel.innerHTML=""; buildSoundPanel(); } }
+
 function toggleSoundPanel(){
   if(!sndPanel) return;
   if(!SND.ctx) audioStart();          // без звука панель бессмысленна
@@ -2210,6 +2397,52 @@ function toggleSoundPanel(){
   sndPanelOn=!sndPanelOn;
   sndPanel.classList.toggle("on",sndPanelOn);
   wake();
+}
+
+/* ==== ui/langmenu.js ==== */
+/* ================= выбор языка (клавиша P) =================
+   Заставку смотрят не только дома, поэтому по умолчанию английский, а
+   русский — выбором, который запоминается. Меню маленькое и живёт по тем же
+   правилам, что и остальные: стрелки, Enter, Esc. */
+
+const langEl=document.getElementById("langmenu");
+let langOpen=false, langSel=0;
+
+function buildLangMenu(){
+  if(!langEl) return;
+  langSel=Math.max(0,LANG_LIST.map(l=>l[0]).indexOf(LANG));
+  langEl.innerHTML=
+    '<div class="lg-box">'+
+      '<div class="lg-head">'+T("lang.title")+'<span class="lg-key">P</span></div>'+
+      LANG_LIST.map((l,i)=>
+        '<div class="lg-row'+(i===langSel?" sel":"")+(l[0]===LANG?" cur":"")+
+        '" data-code="'+l[0]+'"><b>'+l[1]+'</b><i>'+l[0].toUpperCase()+'</i></div>').join("")+
+      '<div class="lg-hint">'+T("lang.hint")+'</div>'+
+    '</div>';
+  langEl.querySelectorAll(".lg-row").forEach(r=>{
+    r.addEventListener("click",()=>{ setLang(r.dataset.code); buildLangMenu(); });
+  });
+}
+
+function toggleLangMenu(){
+  if(!langEl) return;
+  langOpen=!langOpen;
+  if(langOpen) buildLangMenu();
+  langEl.classList.toggle("on",langOpen);
+  wake();
+}
+
+function langMove(step){
+  if(!langOpen) return;
+  langSel=(langSel+step+LANG_LIST.length)%LANG_LIST.length;
+  const rows=langEl.querySelectorAll(".lg-row");
+  rows.forEach((r,i)=>r.classList.toggle("sel",i===langSel));
+}
+
+function langConfirm(){
+  if(!langOpen) return;
+  setLang(LANG_LIST[langSel][0]);
+  buildLangMenu();
 }
 
 /* ==== ui/jumpmenu.js ==== */
@@ -2227,12 +2460,12 @@ let jumpOpen=false, jumpList=[], jumpSel=0;
 
 function jumpRow(t,sel){
   const name = t.home ? "SOL" : t.seed.replace(/S$/,"");
-  const star = t.star ? t.star.k+"-type" : "без светила";
-  const pl = t.home ? "8 планет"
-    : (t.visited ? (t.planets===0 ? "планет нет" : t.planets+" планет") : "?");
-  const dist = t.d===null ? "—" : t.d.toFixed(1)+" св. г.";
-  const note = t.home ? "дом · маяк"
-    : (!t.reach ? "вне дальности" : t.visited ? "пройдена" : "не посещена");
+  const star = t.star ? t.star.k+"-type" : T("jump.noStar");
+  const pl = t.home ? "8 "+T("jump.planets")
+    : (t.visited ? (t.planets===0 ? T("jump.noPlanets") : t.planets+" "+T("jump.planets")) : "?");
+  const dist = t.d===null ? "—" : t.d.toFixed(1)+" "+T("u.ly");
+  const note = t.home ? T("jump.home")
+    : (!t.reach ? T("jump.far") : t.visited ? T("jump.visited") : T("jump.new"));
   return '<div class="jrow'+(sel?" sel":"")+(t.reach?"":" far")+'">'+
     '<b>'+name+'</b><span>'+star+'</span><span>'+pl+'</span>'+
     '<i>'+dist+'</i><em>'+note+'</em></div>';
@@ -2274,12 +2507,12 @@ function buildJumpMenu(){
 
   jumpEl.innerHTML=
     '<div class="jtop"><h2>FRAME SHIFT DRIVE</h2>'+
-      '<div class="jsub">выбор цели · дальность '+JUMP.rangeLy.toFixed(1)+' св. лет</div>'+
-      '<div class="jhint">↑ ↓ выбор · Enter прыжок · Esc отмена</div></div>'+
+      '<div class="jsub">'+T("jump.sub")+' '+JUMP.rangeLy.toFixed(1)+' '+T("u.ly")+'</div>'+
+      '<div class="jhint">'+T("jump.hint")+'</div></div>'+
     '<div class="jbody">'+
       '<div class="jlist">'+jumpList.map((t,n)=>jumpRow(t,n===jumpSel)).join("")+'</div>'+
       '<div class="jmapbox">'+jumpMapSVG()+
-        '<div class="si-cap">сектор '+JUMP.sectorLy+' св. лет</div></div>'+
+        '<div class="si-cap">'+T("jump.sectorCap")+' '+JUMP.sectorLy+' '+T("u.ly")+'</div></div>'+
     '</div>';
 }
 
@@ -2332,18 +2565,18 @@ function sectorMapSVG(){
 
 function planetCardHTML(p){
   const comp=p.comp.map(c=>
-    '<div class="cmp"><span>'+c[0]+'</span><u><i style="width:'+c[1].toFixed(0)+'%"></i></u><b>'+
+    '<div class="cmp"><span>'+T(c[0])+'</span><u><i style="width:'+c[1].toFixed(0)+'%"></i></u><b>'+
     c[1].toFixed(0)+'%</b></div>').join("");
   return '<div class="pcard">'+
-    '<div class="pc-head">'+p.name+' · '+p.t.ru+(p.arrival?' <em>точка прилёта</em>':'')+'</div>'+
+    '<div class="pc-head">'+T("n."+p.name)+' · '+T(p.t.key)+(p.arrival?' <em>'+T("info.arrival")+'</em>':'')+'</div>'+
     '<div class="pc-grid">'+
-      '<div><span>радиус</span><b>'+fmtNum(p.radius)+' км</b></div>'+
-      '<div><span>орбита</span><b>'+p.au.toFixed(p.au<1?3:2)+' а. е.</b></div>'+
-      '<div><span>сутки</span><b>'+p.day+' ч</b></div>'+
-      '<div><span>год</span><b>'+(p.year>900?(p.year/365.25).toFixed(1)+' года':fmtNum(p.year)+' сут')+'</b></div>'+
-      '<div><span>температура</span><b>'+p.tempK+' K · '+Math.round(p.tempK-273)+' °C</b></div>'+
-      '<div><span>спутники</span><b>'+p.moons+'</b></div>'+
-      '<div><span>кольца</span><b>'+(p.rings?"есть":"нет")+'</b></div>'+
+      '<div><span>'+T("info.radius")+'</span><b>'+fmtNum(p.radius)+' '+T("u.km")+'</b></div>'+
+      '<div><span>'+T("info.orbit")+'</span><b>'+p.au.toFixed(p.au<1?3:2)+' '+T("u.au")+'</b></div>'+
+      '<div><span>'+T("info.day")+'</span><b>'+p.day+' '+T("u.h")+'</b></div>'+
+      '<div><span>'+T("info.year")+'</span><b>'+(p.year>900?(p.year/365.25).toFixed(1)+' '+T("u.yr"):fmtNum(p.year)+' '+T("u.d"))+'</b></div>'+
+      '<div><span>'+T("info.temp")+'</span><b>'+p.tempK+' K · '+Math.round(p.tempK-273)+' °C</b></div>'+
+      '<div><span>'+T("info.moons")+'</span><b>'+p.moons+'</b></div>'+
+      '<div><span>'+T("info.rings")+'</span><b>'+(p.rings?T("info.yes"):T("info.no"))+'</b></div>'+
     '</div><div class="pc-comp">'+comp+'</div></div>';
 }
 
@@ -2369,46 +2602,46 @@ function commsDelay(){
     const at=planets&&planets.at;
     const au=at?Math.hypot(at.x,at.y,at.z):1;
     const sec=au*499;                       // свет идёт 499 секунд на астрономическую единицу
-    return sec<1 ? (sec*1000).toFixed(0)+" мс"
-         : sec<90 ? sec.toFixed(1)+" с" : (sec/60).toFixed(1)+" мин";
+    return sec<1 ? (sec*1000).toFixed(0)+" "+T("u.ms")
+         : sec<90 ? sec.toFixed(1)+" "+T("u.s") : (sec/60).toFixed(1)+" "+T("u.min");
   }
   const ly=lyHome();
-  return ly===null ? "вне сектора" : fmtNum(ly*10)/10+" лет";
+  return ly===null ? T("comms.outside") : (Math.round(ly*10)/10)+" "+T("u.yr");
 }
 
 function commsHTML(){
   const c=CHANNELS[0];
   const home=sun&&sun.solar;
   return '<div class="comms">'+
-    '<div class="ch-head">СВЯЗЬ</div>'+
+    '<div class="ch-head">'+T("comms.head")+'</div>'+
     '<div class="chan'+(home?" live":"")+'" id="chan-mir">'+
       stationIcon()+
       '<div class="chan-body">'+
-        '<div class="chan-name">'+c.name+' <em>'+c.call+'</em></div>'+
+        '<div class="chan-name">'+T("comms.station")+' <em>'+c.call+'</em></div>'+
         '<div class="chan-grid">'+
-          '<div><span>частота</span><b>'+c.freq+'</b></div>'+
-          '<div><span>режим</span><b>'+c.mode+'</b></div>'+
-          '<div><span>мощность</span><b>'+c.power+'</b></div>'+
-          '<div><span>орбита</span><b>'+c.orbit+'</b></div>'+
-          '<div><span>экипаж</span><b>'+c.crew+'</b></div>'+
-          '<div><span>задержка</span><b>'+commsDelay()+'</b></div>'+
+          '<div><span>'+T("comms.freq")+'</span><b>'+T("comms.freq.v")+'</b></div>'+
+          '<div><span>'+T("comms.mode")+'</span><b>'+T("comms.mode.v")+'</b></div>'+
+          '<div><span>'+T("comms.power")+'</span><b>5 '+T("u.w")+'</b></div>'+
+          '<div><span>'+T("comms.orbit")+'</span><b>390 '+T("u.km")+' · 51,6°</b></div>'+
+          '<div><span>'+T("comms.crew")+'</span><b>'+c.crew+'</b></div>'+
+          '<div><span>'+T("comms.delay")+'</span><b>'+commsDelay()+'</b></div>'+
         '</div>'+
       '</div>'+
-      '<button class="chan-btn" id="chan-test">проверка канала</button>'+
+      '<button class="chan-btn" id="chan-test">'+T("comms.test")+'</button>'+
     '</div></div>';
 }
 
 function buildSysInfo(){
   if(!infoEl) return;
-  const head='<div class="si-top"><h2>'+(sun&&sun.solar?"СОЛНЕЧНАЯ СИСТЕМА":"SYSTEM "+SEED.replace(/S$/,""))+'</h2>'+
-    '<div class="si-sub">'+(sun?(sun.name?sun.name+" · ":"")+sun.t.k+"-TYPE STAR · "+
-      fmtNum(sun.t.rKm)+" км":"светила нет")+
-    ' · сектор '+(sectorAt+1)+' из '+SECTOR.length+'</div>'+
-    '<button class="si-close" id="si-close">закрыть · I</button></div>';
+  const head='<div class="si-top"><h2>'+(sun&&sun.solar?T("sys.solar"):T("sys.system")+" "+SEED.replace(/S$/,""))+'</h2>'+
+    '<div class="si-sub">'+(sun?(sun.name?T("n."+sun.name)+" · ":"")+T("star.fmt").replace("{k}",sun.t.k)+" · "+
+      fmtNum(sun.t.rKm)+" "+T("u.km"):T("star.none"))+
+    ' · '+T("info.sector")+' '+(sectorAt+1)+'/'+SECTOR.length+'</div>'+
+    '<button class="si-close" id="si-close">'+T("info.close")+' · I</button></div>';
 
   if(!planets){
-    infoEl.innerHTML=head+'<div class="si-empty">Планет в этой системе нет — только пыль и свет чужих звёзд.'+
-      '</div><div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">сектор · 20 систем</div></div>'+
+    infoEl.innerHTML=head+'<div class="si-empty">'+T("info.empty")+
+      '</div><div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">'+T("info.sector")+' · '+SECTOR.length+' '+T("info.systems")+'</div></div>'+
       commsHTML();
   }else{
     const parade=planets.list.map(p=>{
@@ -2420,14 +2653,14 @@ function buildSysInfo(){
       p.light=real;
       return '<figure class="pl'+(p.arrival?' at':'')+'">'+
         '<img src="'+c.toDataURL()+'" alt="">'+
-        '<figcaption>'+p.name+'<span>'+p.t.ru+'</span></figcaption></figure>';
+        '<figcaption>'+T("n."+p.name)+'<span>'+T(p.t.key)+'</span></figcaption></figure>';
     }).join("");
     infoEl.innerHTML=head+
       '<div class="si-parade">'+parade+'</div>'+
       '<div class="si-cols">'+
         '<div class="si-left">'+planetCardHTML(planets.at)+'</div>'+
-        '<div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">сектор · '+
-          SECTOR.length+' систем · пройдено '+SECTOR.filter(s=>s.visited).length+'</div></div>'+
+        '<div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">'+T("info.sector")+' · '+
+          SECTOR.length+' '+T("info.systems")+' · '+T("info.visited")+' '+SECTOR.filter(s=>s.visited).length+'</div></div>'+
       '</div>'+commsHTML();
   }
   const btn=document.getElementById("si-close");
@@ -2465,6 +2698,7 @@ resize();                        // размеры кадра нужны ран�
 buildSector(startSeed);          // двадцать систем на старте
 buildWorld(startSeed);
 noteSystem();          // родная система сразу известна
+applyStaticLang();        // подписи в разметке — на выбранном языке
 setThrottle(.45);
 requestAnimationFrame(t=>{last=t;requestAnimationFrame(frame)});
 })();

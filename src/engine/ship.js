@@ -47,7 +47,7 @@ function shipUpdate(dt,load,boost,jumpK){
   STATUS.shield=Math.min(100, STATUS.shield + dt*(2.2-load*1.2));
 }
 
-function fmt1(v){ return (Math.round(v*10)/10).toLocaleString("ru-RU"); }
+function fmt1(v){ return TN(Math.round(v*10)/10); }
 
 /* расстояние до дома в световых годах — из него же выводится задержка связи */
 function lyHome(){
@@ -65,27 +65,27 @@ function shipReadout(){
   const rad=8+(STATUS.star||0)*260;
   const at=planets&&planets.at;
   return [
-    ["ТЯГА",        Math.round(S.throttle*100)+" %",    S.throttle],
-    ["СКОРОСТЬ",    Math.round(S.speed*38).toLocaleString("ru-RU")+" м/с", load],
-    ["РЕАКТОР",     Math.round(28+load*70+boost*2)+" %", .28+load*.7],
-    ["ТОПЛИВО",     fmt1(STATUS.fuel)+" %",               STATUS.fuel/100],
-    ["АКТИВНАЯ ЗОНА", Math.round(STATUS.coreT)+" K",      Math.min(1,STATUS.coreT/4200)],
-    ["ДВИГАТЕЛЬ",   Math.round(STATUS.driveT)+" K",       Math.min(1,STATUS.driveT/900)],
-    ["ОБШИВКА",     Math.round(STATUS.skinT)+" K",        Math.min(1,STATUS.skinT/700)],
-    ["КОРПУС",      Math.round(STATUS.hull)+" %",         STATUS.hull/100],
-    ["ЩИТЫ",        Math.round(STATUS.shield)+" %",       STATUS.shield/100],
-    ["ПРИВОД",      Math.round(jumpCharge*100)+" %",    jumpCharge],
-    ["ДАЛЬНОСТЬ",   JUMP.rangeLy.toFixed(1)+" св. г.",  1],
-    ["РЕСУРС",      fmt1(100-STATUS.wear)+" %",           (100-STATUS.wear)/100],
-    ["КИСЛОРОД",    fmt1(STATUS.o2)+" %",                 STATUS.o2/100],
-    ["УГЛЕКИСЛОТА", Math.round(STATUS.co2)+" ppm",        Math.min(1,STATUS.co2/1200)],
-    ["ТЯЖЕСТЬ",     (0.94+boost*.22).toFixed(2)+" g",   (0.94+boost*.22)/2],
-    ["РАДИАЦИЯ",    Math.round(rad)+" мкЗв/ч",          Math.min(1,rad/900)],
-    ["ДО СВЕТИЛА",  dStar===null?"—":dStar.toFixed(2)+" а. е.", dStar===null?0:Math.min(1,dStar/30)],
-    ["ДО ЦЕЛИ",     at?(Math.hypot(at.x,at.y,at.z)*SCALE.kmPerAU/1000).toFixed(0)+" тыс. км":"—",
+    ["d.throttle", Math.round(S.throttle*100)+" %", S.throttle],
+    ["d.speed", TN(Math.round(S.speed*38))+" "+T("hud.speed").toLowerCase(), load],
+    ["d.reactor", Math.round(28+load*70+boost*2)+" %", .28+load*.7],
+    ["d.fuel", fmt1(STATUS.fuel)+" %", STATUS.fuel/100],
+    ["d.core", Math.round(STATUS.coreT)+" K", Math.min(1,STATUS.coreT/4200)],
+    ["d.drive", Math.round(STATUS.driveT)+" K", Math.min(1,STATUS.driveT/900)],
+    ["d.skin", Math.round(STATUS.skinT)+" K", Math.min(1,STATUS.skinT/700)],
+    ["d.hull", Math.round(STATUS.hull)+" %", STATUS.hull/100],
+    ["d.shield", Math.round(STATUS.shield)+" %", STATUS.shield/100],
+    ["d.fsd", Math.round(jumpCharge*100)+" %", jumpCharge],
+    ["d.range", JUMP.rangeLy.toFixed(1)+" "+T("u.ly"), 1],
+    ["d.wear", fmt1(100-STATUS.wear)+" %", (100-STATUS.wear)/100],
+    ["d.o2", fmt1(STATUS.o2)+" %", STATUS.o2/100],
+    ["d.co2", Math.round(STATUS.co2)+" "+T("u.ppm"), Math.min(1,STATUS.co2/1200)],
+    ["d.grav", (0.94+boost*.22).toFixed(2)+" g", (0.94+boost*.22)/2],
+    ["d.rad", Math.round(rad)+" "+T("u.usv"), Math.min(1,rad/900)],
+    ["d.star", dStar===null?"—":dStar.toFixed(2)+" "+T("u.au"), dStar===null?0:Math.min(1,dStar/30)],
+    ["d.target", at?TN(+(Math.hypot(at.x,at.y,at.z)*SCALE.kmPerAU/1000).toFixed(0))+" "+T("u.kkm"):"—",
                     at?Math.min(1,Math.hypot(at.x,at.y,at.z)*4000):0],
-    ["СВЯЗЬ · ДОМ", home===null?"вне сектора":fmt1(home)+" лет",
+    ["d.home", home===null?T("comms.outside"):fmt1(home)+" "+T("u.yr"),
                     home===null?0:Math.min(1,home/JUMP.sectorLy)],
-    ["СНОС НАВИГ.", Math.round(STATUS.drift)+" км",       Math.min(1,STATUS.drift/9000)]
+    ["d.drift", TN(Math.round(STATUS.drift))+" "+T("u.km"), Math.min(1,STATUS.drift/9000)]
   ];
 }

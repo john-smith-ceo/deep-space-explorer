@@ -72,6 +72,14 @@ function cloudSprite(col,peak){
   return c;
 }
 
+/* подпись системы в верхней строке — зависит от языка, потому вынесена */
+function sysLabel(){
+  if(typeof sysEl==="undefined"||!sysEl) return;
+  const name = sun&&sun.solar ? T("sys.solar")
+    : T("sys.system")+" "+String(SEED).replace(/S$/,"");
+  sysEl.textContent = name+" · "+(sun ? T("star.fmt").replace("{k}",sun.t.k) : T("sys.noStar"));
+}
+
 /* ================= мир ================= */
 let SEED="", GAS_SPR=[], DUST_SPR=[];
 let gas=[], dust=[], grit=[], far=[], sun=null, planets=null;
@@ -154,8 +162,7 @@ function buildWorld(seed){
     placeArrival(sun,planets);            // ставит корабль и раздаёт векторы
     sun.tex=starTexture(sun); sun.halo=starHalo(sun);
   }
-  if(sysEl) sysEl.textContent=(sun&&sun.solar ? "СОЛНЕЧНАЯ СИСТЕМА"
-    : "SYSTEM "+seed.replace(/S$/,""))+" · "+(sun?sun.t.k+"-TYPE STAR":"NO STAR");
+  sysLabel();
   if(typeof syncSysInfo==="function") syncSysInfo();       // сводка по системе и радар
   try{ history.replaceState(null,"","#"+seed); }catch(e){}
 }

@@ -38,14 +38,14 @@ function sndLine(){
 function buildSoundPanel(){
   if(!sndPanel||sndPanelBuilt) return;
   sndPanel.innerHTML=
-    '<div class="sc-head">ЗВУК<span class="sc-key">K</span></div>'+
+    '<div class="sc-head">'+T("snd.title")+'<span class="sc-key">K</span></div>'+
     SND_FIELDS.map((f,i)=>
       '<label><span>'+f[1]+'</span><b id="sv'+i+'">'+(+SOUND[f[0]]).toFixed(3)+'</b>'+
       '<input type="range" min="'+f[2]+'" max="'+f[3]+'" step="'+f[4]+
       '" value="'+SOUND[f[0]]+'" data-i="'+i+'"></label>').join("")+
     '<textarea class="sc-out" id="sndout" readonly rows="3"></textarea>'+
-    '<div class="sc-btns"><button id="sndcopy">выделить</button>'+
-    '<button id="sndreset">сброс</button></div>';
+    '<div class="sc-btns"><button id="sndcopy">'+T("snd.select")+'</button>'+
+    '<button id="sndreset">'+T("snd.reset")+'</button></div>';
 
   sndPanel.querySelectorAll("input[type=range]").forEach(inp=>{
     inp.addEventListener("input",e=>{
@@ -68,6 +68,8 @@ function buildSoundPanel(){
   });
   sndPanelBuilt=true;
 }
+
+function syncStarPanelLang(){ sndPanelBuilt=false; if(sndPanel){ sndPanel.innerHTML=""; buildSoundPanel(); } }
 
 function toggleSoundPanel(){
   if(!sndPanel) return;

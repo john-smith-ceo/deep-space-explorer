@@ -205,3 +205,20 @@ canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
 .chan.tx{border-color:rgba(159,212,255,.7);box-shadow:0 0 26px rgba(159,212,255,.12)}
 .chan.tx .chan-btn{background:rgba(159,212,255,.25);animation:txblink 1s ease-in-out infinite}
 @keyframes txblink{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* выбор языка */
+.langmenu{position:fixed;inset:0;z-index:34;display:none;align-items:center;justify-content:center;
+  background:rgba(2,3,10,.72);backdrop-filter:blur(3px)}
+.langmenu.on{display:flex}
+.lg-box{min-width:280px;border:1px solid rgba(255,157,47,.34);background:rgba(8,8,14,.94);
+  padding:18px 20px 14px;font-size:12px;letter-spacing:.08em;color:rgba(255,196,120,.9)}
+.lg-head{display:flex;align-items:center;font-size:11px;letter-spacing:.26em;
+  color:var(--amber);margin-bottom:14px}
+.lg-key{margin-left:auto;border:1px solid rgba(255,157,47,.4);padding:1px 7px;opacity:.7}
+.lg-row{display:flex;align-items:center;gap:12px;padding:9px 12px;cursor:pointer;
+  border-left:2px solid transparent}
+.lg-row b{font-weight:400;font-size:14px;letter-spacing:.12em}
+.lg-row i{font-style:normal;margin-left:auto;font-size:10px;opacity:.45}
+.lg-row.sel{background:rgba(255,157,47,.10);border-left-color:var(--amber)}
+.lg-row.cur b{color:var(--ice)}
+.lg-hint{margin-top:12px;font-size:10px;letter-spacing:.14em;opacity:.45}

@@ -147,14 +147,14 @@ const PLANET={
   ringChance:.34,                   // шанс колец у газового гиганта
   orbit0:.36, orbitStep:1.62,       // ряд орбит: каждая следующая дальше в 1,6 раза
   types:[
-    {k:"rock",  ru:"каменистая",     base:"128,112,98",  alt:"92,78,66",   band:0,  atm:.10, atmCol:"150,160,180"},
-    {k:"iron",  ru:"железная",       base:"140,104,86",  alt:"96,66,54",   band:0,  atm:.04, atmCol:"180,140,120"},
-    {k:"ice",   ru:"ледяная",        base:"196,214,232", alt:"150,176,206",band:0,  atm:.16, atmCol:"180,210,255"},
-    {k:"ocean", ru:"океаническая",   base:"46,92,150",   alt:"120,150,110",band:0,  atm:.30, atmCol:"120,180,255"},
-    {k:"lava",  ru:"вулканическая",  base:"92,44,34",    alt:"226,110,40", band:0,  atm:.14, atmCol:"255,140,90"},
-    {k:"desert",ru:"пустынная",      base:"186,150,102", alt:"140,104,70", band:0,  atm:.12, atmCol:"230,200,150"},
-    {k:"gas",   ru:"газовый гигант", base:"196,168,132", alt:"150,120,96", band:1,  atm:.22, atmCol:"235,215,180"},
-    {k:"ice-g", ru:"ледяной гигант", base:"104,150,196", alt:"70,110,160", band:1,  atm:.24, atmCol:"170,210,255"}
+    {k:"rock", key:"p.rock",  base:"128,112,98",  alt:"92,78,66",   band:0,  atm:.10, atmCol:"150,160,180"},
+    {k:"iron", key:"p.iron",  base:"140,104,86",  alt:"96,66,54",   band:0,  atm:.04, atmCol:"180,140,120"},
+    {k:"ice", key:"p.ice",   base:"196,214,232", alt:"150,176,206",band:0,  atm:.16, atmCol:"180,210,255"},
+    {k:"ocean", key:"p.ocean", base:"46,92,150",   alt:"120,150,110",band:0,  atm:.30, atmCol:"120,180,255"},
+    {k:"lava", key:"p.lava",  base:"92,44,34",    alt:"226,110,40", band:0,  atm:.14, atmCol:"255,140,90"},
+    {k:"desert", key:"p.desert",base:"186,150,102", alt:"140,104,70", band:0,  atm:.12, atmCol:"230,200,150"},
+    {k:"gas", key:"p.gas",   base:"196,168,132", alt:"150,120,96", band:1,  atm:.22, atmCol:"235,215,180"},
+    {k:"ice-g", key:"p.ice-g", base:"104,150,196", alt:"70,110,160", band:1,  atm:.24, atmCol:"170,210,255"}
   ]
 };
 

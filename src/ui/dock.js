@@ -10,7 +10,7 @@ function dockBuild(){
   if(!dockL||!dockR) return;
   const rows=shipReadout();
   const half=Math.ceil(rows.length/2);
-  const cell=(r)=>'<div class="cellx"><span>'+r[0]+'</span><b></b>'+
+  const cell=(r)=>'<div class="cellx"><span>'+T(r[0])+'</span><b></b>'+
                   '<u><i style="width:0%"></i></u></div>';
   dockL.innerHTML=rows.slice(0,half).map(cell).join("");
   dockR.innerHTML=rows.slice(half).map(cell).join("");
@@ -18,6 +18,9 @@ function dockBuild(){
     [].slice.call(dockL.querySelectorAll(".cellx")),
     [].slice.call(dockR.querySelectorAll(".cellx")));
 }
+
+/* смена языка: подписи перерисовываются, значения дойдут со следующим тиком */
+function dockRelabel(){ dockCells=null; dockBuild(); }
 
 function dockUpdate(dt){
   if(!dockCells) dockBuild();

@@ -7,5 +7,6 @@ resize();                        // размеры кадра нужны ран�
 buildSector(startSeed);          // двадцать систем на старте
 buildWorld(startSeed);
 noteSystem();          // родная система сразу известна
+applyStaticLang();        // подписи в разметке — на выбранном языке
 setThrottle(.45);
 requestAnimationFrame(t=>{last=t;requestAnimationFrame(frame)});

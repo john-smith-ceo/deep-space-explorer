@@ -50,7 +50,7 @@ function drawSysMap(){
   if(!sun){
     mapCtx.fillStyle="rgba(255,157,47,.42)";
     mapCtx.font="9px ui-monospace,monospace"; mapCtx.textAlign="center";
-    mapCtx.fillText("СИСТЕМА БЕЗ СВЕТИЛА",ox,h-6);
+    mapCtx.fillText(T("map.noStar"),ox,h-6);
     return;
   }
 
@@ -93,5 +93,5 @@ function drawSysMap(){
 
   mapCtx.fillStyle="rgba(255,157,47,.5)";
   mapCtx.font="10px ui-monospace,monospace"; mapCtx.textAlign="center";
-  mapCtx.fillText((planets?planets.list.length:0)+" ПЛАНЕТ · "+sun.t.k,ox,h-6);
+  mapCtx.fillText((planets?planets.list.length:0)+" "+T("map.planets")+" · "+sun.t.k,ox,h-6);
 }

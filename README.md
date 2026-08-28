@@ -1,3 +1,22 @@
+# Deep Space Explorer
+
+**Procedural deep space screensaver in a single self-contained HTML file.**
+Generated starfields and nebulae, volumetric stars and planets, the Solar
+System with NASA maps, hyperspace jumps across a 20-system sector, a 3D system
+radar, twenty ship readouts, synthesized reactor sound and radio comms.
+No libraries, no build step to run — open the file and it works offline.
+
+Live: https://pub-d15fbb0cc777497db9c83655787f2abc.r2.dev/deep-space
+Interface: English by default, Russian switchable in-app (key `P`).
+
+Controls: `←↑↓→` steer · wheel / `W` `S` thrust · `Space` boost · `J` jump
+target · `I` system report · `P` language · `K` sound panel · `M` noise
+cancelling · `F` fullscreen · `H` interface · `X` stop.
+
+Build: `python3 build.py` собирает `src/` в `deep-space.html`.
+
+---
+
 # deep-space
 
 Полноэкранная заставка: полёт сквозь космос. Один самодостаточный HTML.

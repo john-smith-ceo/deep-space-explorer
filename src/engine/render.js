@@ -199,7 +199,7 @@ function frame(now){
   if(typeof audioUpdate==="function") audioUpdate(fast,S.boost,jumpK);
   spdEl.textContent=Math.round(S.speed*38).toLocaleString("ru-RU");
   fsdEl.classList.toggle("on",S.boost>.25||J.ph>0);
-  fsdEl.textContent=J.ph?(J.ph===1?"FSD CHARGING":J.ph===2?"WITCHSPACE":"ARRIVAL"):"FRAME SHIFT DRIVE";
+  fsdEl.textContent=J.ph?(J.ph===1?T("hud.charging"):J.ph===2?T("hud.witch"):T("hud.arrival")):T("hud.fsd");
 
   requestAnimationFrame(frame);
 }
