@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Полёт сквозь космос</title>
+<meta name="description" content="Полноэкранная заставка: полёт сквозь глубокий космос. Небо генерируется процедурно из seed, гиперпрыжок уводит в новую систему. Управление тягой и курсом, без установки и зависимостей.">
+<meta property="og:title" content="Полёт сквозь космос">
+<meta property="og:description" content="Млечный Путь, гиперпрыжок, новые системы. Один HTML-файл без картинок.">
+<meta property="og:type" content="website">
+<!--STYLE-->
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="hud" id="hud">
+  <div class="top">DEEP SPACE · <span id="sys">SYSTEM</span></div>
+  <div class="throttle">
+    <div class="tbar"><div class="tfill" id="tfill" style="height:45%"></div>
+      <i style="bottom:25%"></i><i style="bottom:50%"></i><i style="bottom:75%"></i>
+    </div>
+    <div class="tlabel">THROTTLE</div>
+    <div class="tval" id="tval">45%</div>
+  </div>
+  <div class="speed"><div class="n" id="spd">0</div><div class="u">M/S</div>
+    <div class="fsd" id="fsd">FRAME SHIFT DRIVE</div>
+  </div>
+  <div class="retic"><span></span><span></span><span></span><span></span><b></b></div>
+  <div class="dock">
+    <div class="dock-side" id="dock-l"></div>
+    <canvas class="sysmap" id="sysmap" width="515" height="293"></canvas>
+    <div class="dock-side" id="dock-r"></div>
+  </div>
+  <div class="help" id="help">
+    <kbd>← ↑ ↓ →</kbd> курс <kbd>колесо</kbd> / <kbd>W</kbd><kbd>S</kbd> тяга
+    <kbd>Space</kbd> форсаж <kbd>J</kbd> выбор цели <kbd>I</kbd> система
+    <kbd>X</kbd> стоп <kbd>M</kbd> шумоподавление <kbd>K</kbd> настройка <kbd>F</kbd> полный экран <kbd>H</kbd> интерфейс
+  </div>
+</div>
+
+<div class="sysinfo" id="sysinfo"></div>
+<div class="jumpmenu" id="jumpmenu"></div>
+<div class="sndcfg" id="sndcfg"></div>
+
+<div class="boot" id="boot">
+  <h1>Deep Space</h1>
+  <p>полёт сквозь пыль и звёзды<br>стрелки ведут курс · колесо задаёт тягу · пробел форсирует<br><b>J</b> — прыжок в соседнюю систему · <b>I</b> — сводка по системе</p>
+  <button id="go">Запустить полёт</button>
+</div>
+<!--SCRIPT-->
+</body>
+</html>
