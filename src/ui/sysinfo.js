@@ -11,12 +11,13 @@ function sectorMapSVG(){
   const R=54, cx=60, cy=60;
   let s='<svg viewBox="0 0 120 120" class="secmap">';
   s+='<circle cx="60" cy="60" r="54" class="sec-ring"/><circle cx="60" cy="60" r="27" class="sec-ring"/>';
-  for(let i=0;i<SECTOR.length;i++){
-    const it=SECTOR[i], x=cx+it.x*R, y=cy+it.y*R;
-    const cls = i===sectorAt ? "sec-here" : it.visited ? "sec-seen" : "sec-new";
-    const r = it.seed.slice(-1)==="S" ? 3.1 : 1.7;   // со светилом — крупнее
+  for(let i=0;i<GALAXY.systems.length;i++){
+    const it=GALAXY.systems[i];
+    const h=JUMP.sectorLy/2, x=cx+(it.x/h)*R, y=cy+(it.y/h)*R;
+    const cls = i===GALAXY.at ? "sec-here" : it.visited ? "sec-seen" : "sec-new";
+    const r = it.star ? 3.1 : 1.7;   // со светилом — крупнее
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+r+'" class="'+cls+'"/>';
-    if(i===sectorAt) s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6.5" class="sec-mark"/>';
+    if(i===GALAXY.at) s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6.5" class="sec-mark"/>';
   }
   s+='</svg>';
   return s;
@@ -69,19 +70,24 @@ function commsDelay(){
 }
 
 function commsHTML(){
-  const c=CHANNELS[0];
+  const list=commsChannels();
+  if(!list.length){
+    return '<div class="comms"><div class="ch-head">'+T("comms.head")+'</div>'+
+      '<div class="si-empty">'+T("comms.none")+'</div></div>';
+  }
+  const o=list[0], c=o.comms;
   const home=sun&&sun.solar;
   return '<div class="comms">'+
     '<div class="ch-head">'+T("comms.head")+'</div>'+
     '<div class="chan'+(home?" live":"")+'" id="chan-mir">'+
       stationIcon()+
       '<div class="chan-body">'+
-        '<div class="chan-name">'+T("comms.station")+' <em>'+c.call+'</em></div>'+
+        '<div class="chan-name">'+T(o.nameKey)+' <em>'+c.call+'</em></div>'+
         '<div class="chan-grid">'+
-          '<div><span>'+T("comms.freq")+'</span><b>'+T("comms.freq.v")+'</b></div>'+
-          '<div><span>'+T("comms.mode")+'</span><b>'+T("comms.mode.v")+'</b></div>'+
-          '<div><span>'+T("comms.power")+'</span><b>5 '+T("u.w")+'</b></div>'+
-          '<div><span>'+T("comms.orbit")+'</span><b>390 '+T("u.km")+' · 51,6°</b></div>'+
+          '<div><span>'+T("comms.freq")+'</span><b>'+T(c.freqKey)+'</b></div>'+
+          '<div><span>'+T("comms.mode")+'</span><b>'+T(c.modeKey)+'</b></div>'+
+          '<div><span>'+T("comms.power")+'</span><b>'+c.power+' '+T("u.w")+'</b></div>'+
+          '<div><span>'+T("comms.orbit")+'</span><b>'+c.orbitKm+' '+T("u.km")+' · '+c.incl+'°</b></div>'+
           '<div><span>'+T("comms.crew")+'</span><b>'+c.crew+'</b></div>'+
           '<div><span>'+T("comms.delay")+'</span><b>'+commsDelay()+'</b></div>'+
         '</div>'+
@@ -95,12 +101,12 @@ function buildSysInfo(){
   const head='<div class="si-top"><h2>'+(sun&&sun.solar?T("sys.solar"):T("sys.system")+" "+SEED.replace(/S$/,""))+'</h2>'+
     '<div class="si-sub">'+(sun?(sun.name?T("n."+sun.name)+" · ":"")+T("star.fmt").replace("{k}",sun.t.k)+" · "+
       fmtNum(sun.t.rKm)+" "+T("u.km"):T("star.none"))+
-    ' · '+T("info.sector")+' '+(sectorAt+1)+'/'+SECTOR.length+'</div>'+
+    ' · '+T("info.sector")+' '+(GALAXY.at+1)+'/'+GALAXY.systems.length+'</div>'+
     '<button class="si-close" id="si-close">'+T("info.close")+' · I</button></div>';
 
   if(!planets){
     infoEl.innerHTML=head+'<div class="si-empty">'+T("info.empty")+
-      '</div><div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">'+T("info.sector")+' · '+SECTOR.length+' '+T("info.systems")+'</div></div>'+
+      '</div><div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">'+T("info.sector")+' · '+GALAXY.systems.length+' '+T("info.systems")+'</div></div>'+
       commsHTML();
   }else{
     const parade=planets.list.map(p=>{
@@ -119,7 +125,7 @@ function buildSysInfo(){
       '<div class="si-cols">'+
         '<div class="si-left">'+planetCardHTML(planets.at)+'</div>'+
         '<div class="si-sector">'+sectorMapSVG()+'<div class="si-cap">'+T("info.sector")+' · '+
-          SECTOR.length+' '+T("info.systems")+' · '+T("info.visited")+' '+SECTOR.filter(s=>s.visited).length+'</div></div>'+
+          GALAXY.systems.length+' '+T("info.systems")+' · '+T("info.visited")+' '+GALAXY.systems.filter(s=>s.visited).length+'</div></div>'+
       '</div>'+commsHTML();
   }
   const btn=document.getElementById("si-close");

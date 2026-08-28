@@ -227,27 +227,14 @@ function makePlanet(sn,i,o){
   return p;
 }
 
-function buildPlanets(sn){
-  const list=[];
-  if(sn.solar){                                      // наша система — по таблице
-    for(let i=0;i<SOLAR.planets.length;i++) list.push(makePlanet(sn,i,SOLAR.planets[i]));
-    const at=list.filter(p=>SOLAR.planets[p.i].arrival)[0]||list[2];
-    at.arrival=true;
-    return {list:list, at:at};
-  }
-  const n=1+Math.floor(rnd()*PLANET.maxCount);       // от одной до девяти
-  let au=PLANET.orbit0*(.7+rnd()*.9);
-  for(let i=0;i<n;i++){
-    const t=PLANET.types[Math.floor(rnd()*PLANET.types.length)];
-    const gas=t.k==="gas"||t.k==="ice-g";
-    list.push(makePlanet(sn,i,{
-      type:t,
-      radius:gas ? 24000+rnd()*46000 : 2400+rnd()*7600,
-      au:au
-    }));
-    au*=PLANET.orbitStep*(.82+rnd()*.5);             // ряд орбит, как у нас: каждая дальше
-  }
-  const at=list[Math.floor(rnd()*list.length)];
+/* Тела собираются по записи из базы: состав системы посчитан один раз при
+   запуске, здесь он только обрастает текстурами и шумом. Движок больше не
+   решает, что за планеты в системе, — он их материализует. */
+function buildPlanets(sn,rec){
+  const list=(rec&&rec.planets?rec.planets:[]).map((spec,i)=>makePlanet(sn,i,spec));
+  if(!list.length) return {list:[], at:null};
+  let at=list.filter((p,i)=>rec.planets[i].arrival)[0];
+  if(!at){ at=list[Math.min(list.length-1,2)]; }
   at.arrival=true;
   return {list:list, at:at};
 }

@@ -86,6 +86,7 @@ let gas=[], dust=[], grit=[], far=[], sun=null, planets=null;
 
 function buildWorld(seed){
   SEED=seed;
+  const rec=systemById(seed);          // запись из базы: состав уже посчитан
   rnd=mulberry32(hashStr(seed));
 
   /* палитра туманности выводится из seed: базовый тон плюс соседние,
@@ -144,11 +145,9 @@ function buildWorld(seed){
   }
 
   sun=null; planets=null;
-  const solar=(seed==="SOL");
-  if(solar||seed.charAt(seed.length-1)==="S"){
-    // класс берётся той же функцией, что и меню прыжка: иначе в списке
-    // значится B-type, а прилетаешь к G-type
-    const t=starTypeFor(seed);
+  const solar=!!(rec&&rec.solar);
+  if(rec&&rec.star){
+    const t=rec.star;                   // класс уже определён при постройке базы
     // где звезда окажется в кадре, больше не выбирается наугад: она стоит в
     // начале системных координат, а мы — у планеты прилёта
     const fbm=makeNoise3(), P=SUN_SPREAD;
@@ -158,7 +157,7 @@ function buildWorld(seed){
          aspect:P.aspectMin+rnd()*(P.aspectMax-P.aspectMin), // вытянутость ореола
          haloRot:(rnd()-.5)*3.1416,                          // и его наклон
          hue:(rnd()*2-1)*P.hueShift};                        // сдвиг оттенка внутри класса
-    planets=buildPlanets(sun);            // до девяти планет; рисуется одна
+    planets=buildPlanets(sun,rec);        // тела строятся по записи, а не наугад
     placeArrival(sun,planets);            // ставит корабль и раздаёт векторы
     sun.tex=starTexture(sun); sun.halo=starHalo(sun);
   }

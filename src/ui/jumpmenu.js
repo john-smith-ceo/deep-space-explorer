@@ -24,19 +24,19 @@ function jumpRow(t,sel){
 }
 
 function jumpMapSVG(){
-  const here=SECTOR[sectorAt], R=54, cx=60, cy=60, h=JUMP.sectorLy/2;
+  const here=systemAt(), R=54, cx=60, cy=60, h=JUMP.sectorLy/2;
   // круг дальности в тех же единицах, что и координаты карты
   const rr=R*(JUMP.rangeLy/h)/2;
   let s='<svg viewBox="0 0 120 120" class="jmap">';
   s+='<circle cx="60" cy="60" r="54" class="sec-ring"/>';
   s+='<circle cx="60" cy="60" r="'+rr.toFixed(1)+'" class="jrange"/>';
-  for(let i=0;i<SECTOR.length;i++){
-    const it=SECTOR[i];
-    const x=cx+(it.x-here.x)*R/2, y=cy+(it.z-here.z)*R/2;
-    const cls = i===sectorAt ? "sec-here"
+  for(let i=0;i<GALAXY.systems.length;i++){
+    const it=GALAXY.systems[i];
+    const x=cx+((it.x-here.x)/h)*R, y=cy+((it.y-here.y)/h)*R;
+    const cls = i===GALAXY.at ? "sec-here"
       : (jumpList[jumpSel] && jumpList[jumpSel].i===i) ? "sec-target"
       : it.visited ? "sec-seen" : "sec-new";
-    const r = it.seed.slice(-1)==="S"||it.seed==="SOL" ? 3.1 : 1.7;
+    const r = it.star ? 3.1 : 1.7;
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+r+'" class="'+cls+'"/>';
   }
   s+='</svg>';
@@ -48,10 +48,10 @@ function buildJumpMenu(){
   const targets=jumpTargets();
   jumpList=[];
   // дом идёт первой строкой, если мы не в нём
-  if(SECTOR[sectorAt].seed!=="SOL"){
-    const home=SECTOR.filter(s=>s.seed==="SOL")[0];
+  if(systemAt().seed!=="SOL"){
+    const home=systemById("SOL");
     jumpList.push({home:true, seed:"SOL", reach:true,
-      d:home?sectorDist(SECTOR[sectorAt],home):null,
+      d:home?systemDist(systemAt(),home):null,
       star:starTypeFor("SOL"), visited:true, i:-1});
   }
   jumpList=jumpList.concat(targets);

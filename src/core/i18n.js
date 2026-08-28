@@ -19,7 +19,7 @@ const DICT={
     "hud.throttle":"THROTTLE", "hud.speed":"M/S",
     "hud.fsd":"FRAME SHIFT DRIVE", "hud.charging":"FSD CHARGING",
     "hud.witch":"WITCHSPACE", "hud.arrival":"ARRIVAL",
-    "help.system":"system", "help.jump":"jump target", "help.lang":"language",
+    "help.system":"system", "help.jump":"jump target", "help.opt":"options",
     "boot.sub1":"a drift through dust and stars",
     "boot.sub2":"arrows steer · wheel sets thrust · space boosts",
     "boot.sub3":"<b>J</b> — jump to a nearby system · <b>I</b> — system report",
@@ -32,7 +32,7 @@ const DICT={
     "comms.head":"COMMS", "comms.freq":"frequency", "comms.mode":"mode",
     "comms.power":"power", "comms.orbit":"orbit", "comms.crew":"crew",
     "comms.delay":"delay", "comms.test":"channel check", "comms.station":"MIR Station",
-    "comms.mode.v":"FM · duplex", "comms.freq.v":"143.625 MHz", "comms.outside":"outside sector",
+    "comms.mode.v":"FM · duplex", "comms.freq.v":"143.625 MHz", "comms.outside":"outside sector", "comms.none":"No stations within range of this system.",
     "jump.sub":"select target · range", "jump.hint":"↑ ↓ select · Enter jump · Esc cancel",
     "jump.home":"home · beacon", "jump.far":"out of range", "jump.visited":"visited",
     "jump.new":"unvisited", "jump.noStar":"no star", "jump.planets":"planets",
@@ -45,7 +45,12 @@ const DICT={
     "d.shield":"SHIELDS", "d.fsd":"FSD", "d.range":"RANGE", "d.wear":"SERVICE LIFE",
     "d.o2":"OXYGEN", "d.co2":"CARBON DIOXIDE", "d.grav":"GRAVITY", "d.rad":"RADIATION",
     "d.star":"TO STAR", "d.target":"TO TARGET", "d.home":"COMMS · HOME", "d.drift":"NAV DRIFT",
-    "lang.title":"LANGUAGE", "lang.hint":"↑ ↓ select · Enter apply · Esc close",
+    "opt.title":"OPTIONS", "opt.controls":"CONTROLS", "opt.language":"LANGUAGE",
+    "opt.hint":"↑ ↓ select · Enter apply · Esc close",
+    "cmd.steer":"steer", "cmd.thrust":"thrust", "cmd.wheel":"thrust",
+    "cmd.boost":"boost", "cmd.stop":"full stop", "cmd.jump":"jump target",
+    "cmd.system":"system report", "cmd.options":"options", "cmd.sound":"sound panel",
+    "cmd.noise":"noise cancelling", "cmd.fullscreen":"fullscreen", "cmd.hud":"interface",
     "snd.title":"SOUND", "snd.select":"select", "snd.reset":"reset",
     "p.rock":"rocky", "p.iron":"iron", "p.ice":"icy", "p.ocean":"ocean",
     "p.lava":"volcanic", "p.desert":"desert", "p.gas":"gas giant", "p.ice-g":"ice giant",
@@ -65,7 +70,7 @@ const DICT={
     "hud.throttle":"ТЯГА", "hud.speed":"М/С",
     "hud.fsd":"ГИПЕРПРИВОД", "hud.charging":"РАСКРУТКА ПРИВОДА",
     "hud.witch":"ГИПЕРПРОСТРАНСТВО", "hud.arrival":"ВЫХОД",
-    "help.system":"система", "help.jump":"выбор цели", "help.lang":"язык",
+    "help.system":"система", "help.jump":"выбор цели", "help.opt":"опции",
     "boot.sub1":"полёт сквозь пыль и звёзды",
     "boot.sub2":"стрелки ведут курс · колесо задаёт тягу · пробел форсирует",
     "boot.sub3":"<b>J</b> — прыжок в соседнюю систему · <b>I</b> — сводка по системе",
@@ -78,7 +83,7 @@ const DICT={
     "comms.head":"СВЯЗЬ", "comms.freq":"частота", "comms.mode":"режим",
     "comms.power":"мощность", "comms.orbit":"орбита", "comms.crew":"экипаж",
     "comms.delay":"задержка", "comms.test":"проверка канала", "comms.station":"Станция МИР",
-    "comms.mode.v":"FM · дуплекс", "comms.freq.v":"143,625 МГц", "comms.outside":"вне сектора",
+    "comms.mode.v":"FM · дуплекс", "comms.freq.v":"143,625 МГц", "comms.outside":"вне сектора", "comms.none":"В этой системе станций нет — эфир пуст.",
     "jump.sub":"выбор цели · дальность", "jump.hint":"↑ ↓ выбор · Enter прыжок · Esc отмена",
     "jump.home":"дом · маяк", "jump.far":"вне дальности", "jump.visited":"пройдена",
     "jump.new":"не посещена", "jump.noStar":"без светила", "jump.planets":"планет",
@@ -91,7 +96,12 @@ const DICT={
     "d.shield":"ЩИТЫ", "d.fsd":"ПРИВОД", "d.range":"ДАЛЬНОСТЬ", "d.wear":"РЕСУРС",
     "d.o2":"КИСЛОРОД", "d.co2":"УГЛЕКИСЛОТА", "d.grav":"ТЯЖЕСТЬ", "d.rad":"РАДИАЦИЯ",
     "d.star":"ДО СВЕТИЛА", "d.target":"ДО ЦЕЛИ", "d.home":"СВЯЗЬ · ДОМ", "d.drift":"СНОС НАВИГ.",
-    "lang.title":"ЯЗЫК", "lang.hint":"↑ ↓ выбор · Enter принять · Esc закрыть",
+    "opt.title":"ОПЦИИ", "opt.controls":"УПРАВЛЕНИЕ", "opt.language":"ЯЗЫК",
+    "opt.hint":"↑ ↓ выбор · Enter принять · Esc закрыть",
+    "cmd.steer":"курс", "cmd.thrust":"тяга", "cmd.wheel":"тяга",
+    "cmd.boost":"форсаж", "cmd.stop":"полная остановка", "cmd.jump":"выбор цели",
+    "cmd.system":"сводка по системе", "cmd.options":"опции", "cmd.sound":"панель звука",
+    "cmd.noise":"шумоподавление", "cmd.fullscreen":"полный экран", "cmd.hud":"интерфейс",
     "snd.title":"ЗВУК", "snd.select":"выделить", "snd.reset":"сброс",
     "p.rock":"каменистая", "p.iron":"железная", "p.ice":"ледяная", "p.ocean":"океаническая",
     "p.lava":"вулканическая", "p.desert":"пустынная", "p.gas":"газовый гигант",
@@ -125,6 +135,7 @@ function setLang(code){
   if(typeof syncSysInfo==="function") syncSysInfo();
   if(typeof dockRelabel==="function") dockRelabel();
   if(typeof buildJumpMenu==="function"&&typeof jumpOpen!=="undefined"&&jumpOpen) buildJumpMenu();
+  if(typeof buildOptions==="function"&&typeof optOpen!=="undefined"&&optOpen) buildOptions();
   if(typeof sysEl!=="undefined"&&sysEl&&typeof SEED!=="undefined") sysLabel();
 }
 
@@ -139,5 +150,5 @@ function applyStaticLang(){
   set("go",T("boot.go"));
   set("help-i",T("help.system"));
   set("help-j",T("help.jump"));
-  set("help-p",T("help.lang"));
+  set("help-o",T("help.opt"));
 }

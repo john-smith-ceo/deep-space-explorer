@@ -16,17 +16,13 @@
 
 const COMMS={busy:false, buf:{}, loading:{}};
 
-/* канал: пока один, но список — чтобы добавлять, а не переписывать */
-const CHANNELS=[{
-  id:"mir",
-  name:"Станция МИР",
-  call:"MIR-1",
-  freq:"143,625 МГц",
-  mode:"FM · дуплекс",
-  power:"5 Вт",
-  orbit:"390 км · 51,6°",
-  crew:3
-}];
+/* Каналы не заданы здесь: движок спрашивает каталог объектов, какие станции
+   уместны в этой системе. Про МИР он не знает — знает только то, что
+   объекты вида "station" умеют разговаривать. */
+function commsChannels(){
+  return (typeof objectsHere==="function" ? objectsHere("station") : [])
+    .filter(o=>o.comms);
+}
 
 function commsNoiseBuf(ctx,sec){
   const len=Math.floor(ctx.sampleRate*sec), b=ctx.createBuffer(1,len,ctx.sampleRate);
@@ -132,6 +128,7 @@ function commsCheck(){
   if(!SND.ctx||COMMS.busy) return false;
   const ctx=SND.ctx;
   COMMS.busy=true;
+  const ch=commsChannels()[0];
   commsDecode("voice",buf=>{
     const t0=ctx.currentTime+.05;
     const ours=buf.duration+1.05;
@@ -141,7 +138,7 @@ function commsCheck(){
     commsSay(buf,t0+.95,.62,1100,.32);           // наш голос: ниже и тише
     commsClick(t0+ours,false);
 
-    commsDecode("mir",mir=>{
+    commsDecode(ch?ch.comms.voice:"mir",mir=>{
       const t1=t0+ours+.85;                      // пауза: станция отвечает не сразу
       const theirs=mir.duration+.35;
       commsClick(t1,true);

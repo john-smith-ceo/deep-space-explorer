@@ -4,9 +4,8 @@ const startSeed = fromHash==="SOL" ? "SOL"
   : (fromHash.replace(/[^0-9A-FS]/g,"") || "SOL");
 resize();                        // размеры кадра нужны раньше мира:
                                  // от них зависит расстояние до планеты прилёта
-buildSector(startSeed);          // двадцать систем на старте
-buildWorld(startSeed);
-noteSystem();          // родная система сразу известна
+buildGalaxy(startSeed);          // весь мир строится один раз, здесь
+buildWorld(GALAXY.systems[0].seed);
 applyStaticLang();        // подписи в разметке — на выбранном языке
 setThrottle(.45);
 requestAnimationFrame(t=>{last=t;requestAnimationFrame(frame)});

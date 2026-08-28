@@ -31,18 +31,11 @@ function startJump(t){
 }
 function arrive(){
   const t=jumpTarget;
-  if(t&&t.home&&SECTOR.filter(s=>s.seed==="SOL").length===0){
-    buildSector("SOL");                  // вернулись домой из чужого сектора
-    buildWorld("SOL");
-  }else{
-    let i;
-    if(t&&t.home) i=SECTOR.map(s=>s.seed).indexOf("SOL");
-    else if(t&&t.i>=0) i=t.i;
-    else i=0;
-    sectorAt=i;
-    buildWorld(SECTOR[i].seed);
-  }
-  noteSystem();                          // теперь мы знаем, сколько тут планет
+  let i = t&&t.home ? GALAXY.byId["SOL"] : (t&&t.i>=0 ? t.i : 0);
+  if(i===undefined) i=0;
+  GALAXY.at=i;
+  GALAXY.systems[i].visited=true;        // отметка на карте: здесь мы были
+  buildWorld(GALAXY.systems[i].seed);
   jumpTarget=null;
   S.yaw=0; S.pitch=0; S.vyaw=0; S.vpitch=0; S.roll=0; S.vroll=0;
 }

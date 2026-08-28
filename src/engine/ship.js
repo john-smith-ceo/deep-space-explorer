@@ -51,9 +51,9 @@ function fmt1(v){ return TN(Math.round(v*10)/10); }
 
 /* расстояние до дома в световых годах — из него же выводится задержка связи */
 function lyHome(){
-  const home=SECTOR.filter(s=>s.seed==="SOL")[0];
+  const home=systemById("SOL");
   if(!home) return null;
-  return sectorDist(SECTOR[sectorAt],home);
+  return systemDist(systemAt(),home);
 }
 
 /* двадцать строк для нижней панели: подпись, значение, доля для полоски */

@@ -15,11 +15,19 @@ SRC = pathlib.Path(__file__).parent / "src"
 OUT = pathlib.Path(__file__).parent / "deep-space.html"
 
 ORDER = [
-    "config.js",
-    "i18n.js",
-    "engine/core.js",
-    "engine/rng.js",
-    "engine/sector.js",
+    # настройки и данные идут первыми: их читают все остальные
+    "settings/world.js",
+    "settings/flight.js",
+    "settings/sound.js",
+    "settings/star-look.js",
+    "data/stars.js",
+    "data/solar.js",
+    "core/i18n.js",
+    "core/canvas.js",
+    "core/rng.js",
+    "data/star-class.js",
+    "data/objects.js",
+    "data/galaxy.js",
     "engine/star.js",
     "engine/planet.js",
     "engine/world.js",
@@ -32,7 +40,7 @@ ORDER = [
     "ui/sysmap.js",
     "ui/dock.js",
     "ui/sound-panel.js",
-    "ui/langmenu.js",
+    "ui/options.js",
     "ui/jumpmenu.js",
     "ui/sysinfo.js",
     "main.js",
