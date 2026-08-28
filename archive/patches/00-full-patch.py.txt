@@ -1,0 +1,108 @@
+cd /tmp/claude-1000/-home-vlad-Projects-proba-tests/0c8812b4-346c-424e-9851-62447e59929c/scratchpad && python3 - <<'PY'
+import base64,re
+h=open('deep-space.html',encoding='utf-8').read()
+def rep(a,b):
+    global h
+    assert a in h, "НЕ НАЙДЕНО: "+a[:80]
+    h=h.replace(a,b,1)
+
+# ---------- 1. панорама в полном разрешении ----------
+b64=base64.b64encode(open('space-full-q84.webp','rb').read()).decode()
+h=re.sub(r'const SKY_DATA="data:image/webp;base64,[^"]*";',
+         'const SKY_DATA="data:image/webp;base64,'+b64+'";', h, count=1)
+rep('let sky=null, skyReady=false, SKY_W=2048, SKY_H=1154;',
+    'let sky=null, skyReady=false, SKY_W=3636, SKY_H=2048;')
+rep('    const scale=Math.max(H*1.25/SKY_H, W/SKY_W*0.78, 1);',
+    '    const scale=Math.max(H*1.06/SKY_H, .34);   // не крупнее натурального — иначе мыло на Retina')
+rep('ctx.fillStyle="rgba(0,2,7,.44)"; ctx.fillRect(0,0,W,H);   // отодвинуть туманность вглубь',
+    'ctx.fillStyle="rgba(0,2,7,.17)"; ctx.fillRect(0,0,W,H);   // лёгкая глубина, без затемнения')
+
+# ---------- 2. пыль и звёзды ----------
+rep('const NEAR=1250, FAR=1500;','const NEAR=880, FAR=1050;')
+rep('  p.w=Math.random()<.12?1:0;          // тёплая пылинка',
+    '  const r=Math.random(); p.w=r<.13?1:(r<.23?2:0);   // тёплая / холодная / нейтральная')
+rep('    const col=p.w?"255,214,168":"198,224,255";',
+    '    const col=p.w===1?"255,212,164":p.w===2?"158,198,255":"228,240,255";')
+rep('''    const len=Math.hypot(sx-px,sy-py);
+    if(len<1.1){
+      ctx.fillStyle="rgba("+col+","+a.toFixed(3)+")";
+      const s=Math.min(2.6,1+k*.05);
+      ctx.fillRect(sx-s/2,sy-s/2,s,s);
+    }else{
+      ctx.strokeStyle="rgba("+col+","+a.toFixed(3)+")";
+      ctx.lineWidth=Math.min(2.8,.8+k*.06);
+      ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(sx,sy); ctx.stroke();
+    }''',
+'''    const len=Math.hypot(sx-px,sy-py);
+    if(len>1.4){                                   // хвост — тонкий и тусклый
+      ctx.strokeStyle="rgba("+col+","+(a*.40).toFixed(3)+")";
+      ctx.lineWidth=Math.min(1.45,.34+k*.026);
+      ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(sx,sy); ctx.stroke();
+    }
+    ctx.fillStyle="rgba("+col+","+a.toFixed(3)+")";  // голова — яркая точка
+    ctx.beginPath(); ctx.arc(sx,sy,Math.min(1.6,.40+k*.028),0,6.2832); ctx.fill();''')
+rep('''      ctx.fillStyle="rgba("+col+","+a.toFixed(3)+")";
+      const s=p.b>.6?1.7:1.1;
+      ctx.fillRect(sx-s/2,sy-s/2,s,s);''',
+'''      ctx.fillStyle="rgba("+col+","+a.toFixed(3)+")";
+      ctx.beginPath(); ctx.arc(sx,sy,p.b>.62?1.0:.62,0,6.2832); ctx.fill();''')
+rep('''      ctx.strokeStyle="rgba("+col+","+(a*.30).toFixed(3)+")"; ctx.lineWidth=.8;
+      ctx.beginPath();
+      ctx.moveTo(sx-r*5.5,sy); ctx.lineTo(sx+r*5.5,sy);
+      ctx.moveTo(sx,sy-r*5.5); ctx.lineTo(sx,sy+r*5.5);
+      ctx.stroke();''',
+'''      ctx.strokeStyle="rgba("+col+","+(a*.20).toFixed(3)+")"; ctx.lineWidth=.55;
+      ctx.beginPath();
+      ctx.moveTo(sx-r*4.2,sy); ctx.lineTo(sx+r*4.2,sy);
+      ctx.moveTo(sx,sy-r*4.2); ctx.lineTo(sx,sy+r*4.2);
+      ctx.stroke();''')
+
+# ---------- 3. курс: стрелки вместо мыши ----------
+rep("const S={yaw:0,pitch:0,vyaw:0,vpitch:0,roll:0,vroll:0,",
+    "const K={l:0,r:0,u:0,d:0};          // стрелки: состояние клавиш\nconst S={yaw:0,pitch:0,vyaw:0,vpitch:0,roll:0,vroll:0,")
+rep("  const tgtYaw=-S.mx*0.55, tgtPitch=S.my*0.42;",
+    "  const tgtYaw=(K.l-K.r)*0.62, tgtPitch=(K.d-K.u)*0.48;")
+rep('''window.addEventListener("pointermove",e=>{
+  S.mx=(e.clientX/window.innerWidth-.5)*2;
+  S.my=(e.clientY/window.innerHeight-.5)*2;
+  wake();
+},{passive:true});''',
+'''window.addEventListener("pointermove",()=>wake(),{passive:true});   // мышь курс не ведёт — только будит интерфейс''')
+rep('''  if(k==="w"||e.key==="ArrowUp"){setThrottle(S.throttle+.06);e.preventDefault()}
+  else if(k==="s"||e.key==="ArrowDown"){setThrottle(S.throttle-.06);e.preventDefault()}
+  else if(e.code==="Space"){S.boostKey=true;e.preventDefault()}
+  else if(k==="f"||k==="а"){toggleFS()}
+  else if(k==="h"||k==="р"){hud.classList.toggle("off")}
+  else if(k==="x"||k==="ч"){setThrottle(0)}''',
+'''  if(e.key==="ArrowLeft"){K.l=1;e.preventDefault()}
+  else if(e.key==="ArrowRight"){K.r=1;e.preventDefault()}
+  else if(e.key==="ArrowUp"){K.u=1;e.preventDefault()}
+  else if(e.key==="ArrowDown"){K.d=1;e.preventDefault()}
+  else if(k==="w"||k==="ц"){setThrottle(S.throttle+.06);e.preventDefault()}
+  else if(k==="s"||k==="ы"){setThrottle(S.throttle-.06);e.preventDefault()}
+  else if(e.code==="Space"){S.boostKey=true;e.preventDefault()}
+  else if(k==="f"||k==="а"){toggleFS()}
+  else if(k==="h"||k==="р"){hud.classList.toggle("off")}
+  else if(k==="x"||k==="ч"){setThrottle(0)}''')
+rep('window.addEventListener("keyup",e=>{ if(e.code==="Space") S.boostKey=false; });',
+'''window.addEventListener("keyup",e=>{
+  if(e.code==="Space") S.boostKey=false;
+  else if(e.key==="ArrowLeft") K.l=0;
+  else if(e.key==="ArrowRight") K.r=0;
+  else if(e.key==="ArrowUp") K.u=0;
+  else if(e.key==="ArrowDown") K.d=0;
+});
+window.addEventListener("blur",()=>{K.l=K.r=K.u=K.d=0;S.boostKey=false;});''')
+
+# ---------- 4. подсказки ----------
+rep('''    <kbd>мышь</kbd> курс <kbd>колесо</kbd> / <kbd>W</kbd><kbd>S</kbd> тяга
+    <kbd>Space</kbd> форсаж <kbd>F</kbd> полный экран <kbd>H</kbd> интерфейс''',
+'''    <kbd>← ↑ ↓ →</kbd> курс <kbd>колесо</kbd> / <kbd>W</kbd><kbd>S</kbd> тяга
+    <kbd>Space</kbd> форсаж <kbd>X</kbd> стоп <kbd>F</kbd> полный экран <kbd>H</kbd> интерфейс''')
+rep('полёт сквозь пыль и звёзды<br>мышь ведёт курс · колесо задаёт тягу · пробел форсирует',
+    'полёт сквозь пыль и звёзды<br>стрелки ведут курс · колесо задаёт тягу · пробел форсирует')
+open('deep-space.html','w',encoding='utf-8').write(h)
+print('патч применён, HTML:', len(h.encode()), 'байт')
+PY

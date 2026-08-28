@@ -1,0 +1,6 @@
+{
+ "replace_all": false,
+ "file_path": "/tmp/claude-1000/-home-vlad-Projects-proba-tests/0c8812b4-346c-424e-9851-62447e59929c/scratchpad/deep-space.html",
+ "old_string": "window.addEventListener(\"keyup\",e=>{ if(e.code===\"Space\") S.boostKey=false; });",
+ "new_string": "window.addEventListener(\"keyup\",e=>{\n  if(e.code===\"Space\") S.boostKey=false;\n  else if(e.key===\"ArrowLeft\") K.l=0;\n  else if(e.key===\"ArrowRight\") K.r=0;\n  else if(e.key===\"ArrowUp\") K.u=0;\n  else if(e.key===\"ArrowDown\") K.d=0;\n});\nwindow.addEventListener(\"blur\",()=>{K.l=K.r=K.u=K.d=0;S.boostKey=false;});   // чтобы зажатая клавиша не увела в вечный вираж"
+}

@@ -1,0 +1,6 @@
+{
+ "replace_all": false,
+ "file_path": "/tmp/claude-1000/-home-vlad-Projects-proba-tests/0c8812b4-346c-424e-9851-62447e59929c/scratchpad/deep-space.html",
+ "old_string": "  if(k===\"w\"||e.key===\"ArrowUp\"){setThrottle(S.throttle+.06);e.preventDefault()}\n  else if(k===\"s\"||e.key===\"ArrowDown\"){setThrottle(S.throttle-.06);e.preventDefault()}\n  else if(e.code===\"Space\"){S.boostKey=true;e.preventDefault()}",
+ "new_string": "  if(e.key===\"ArrowLeft\"){K.l=1;e.preventDefault()}\n  else if(e.key===\"ArrowRight\"){K.r=1;e.preventDefault()}\n  else if(e.key===\"ArrowUp\"){K.u=1;e.preventDefault()}\n  else if(e.key===\"ArrowDown\"){K.d=1;e.preventDefault()}\n  else if(k===\"w\"||k===\"ц\"){setThrottle(S.throttle+.06);e.preventDefault()}\n  else if(k===\"s\"||k===\"ы\"){setThrottle(S.throttle-.06);e.preventDefault()}\n  else if(e.code===\"Space\"){S.boostKey=true;e.preventDefault()}"
+}

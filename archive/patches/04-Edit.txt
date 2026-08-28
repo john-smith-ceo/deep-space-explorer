@@ -1,0 +1,6 @@
+{
+ "replace_all": false,
+ "file_path": "/tmp/claude-1000/-home-vlad-Projects-proba-tests/0c8812b4-346c-424e-9851-62447e59929c/scratchpad/deep-space.html",
+ "old_string": "  <p>полёт сквозь пыль и звёзды<br>мышь ведёт курс · колесо задаёт тягу · пробел форсирует</p>",
+ "new_string": "  <p>полёт сквозь пыль и звёзды<br>стрелки ведут курс · колесо задаёт тягу · пробел форсирует</p>"
+}

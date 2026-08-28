@@ -1,0 +1,6 @@
+{
+ "replace_all": false,
+ "file_path": "/tmp/claude-1000/-home-vlad-Projects-proba-tests/0c8812b4-346c-424e-9851-62447e59929c/scratchpad/deep-space.html",
+ "old_string": "const S={yaw:0,pitch:0,vyaw:0,vpitch:0,roll:0,vroll:0,",
+ "new_string": "const K={l:0,r:0,u:0,d:0};          // стрелки: состояние клавиш\nconst S={yaw:0,pitch:0,vyaw:0,vpitch:0,roll:0,vroll:0,"
+}
